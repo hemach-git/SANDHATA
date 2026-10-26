@@ -1,0 +1,21 @@
+# Private runtime data and credentials
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+runtime/
+data/
+uploads/
+*.db
+*.db-*
+*.sqlite*
+*.log
+# Internal authoring QA and generated archive
+deliverables/qa/
+deliverables/*.zip
+.DS_Store
+Thumbs.db

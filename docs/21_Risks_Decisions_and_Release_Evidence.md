@@ -1,0 +1,65 @@
+# Sandhātā Risks Decisions and Release Evidence
+
+Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+
+This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
+
+## Current baseline
+
+The owner selected Sandhātā with ASCII identifier sandhata, requested paired Markdown and DOCX documents, and created https://github.com/hemach-git/sandhata. The initial implementation is a single-user Streamlit application with SQLite, bounded agent coordination and assisted premium imports. GitHub network commands will be run collaboratively by the owner. Public branding clearance and hosting selection remain open.
+
+## Risk register
+
+| Risk | Impact | Mitigation and owner |
+| --- | --- | --- |
+| Premium account lacks API rights | Automated source coverage reduced | Assisted import; owner verifies approved access |
+| Two-day capacity overrun | Scope or date missed | Vertical slice first; collaborator reports remaining work |
+| Model fabricates evidence | Misleading fit judgment | Literal validation, reviewed evals, suppress invalid score |
+| Resume privacy leak | Private data disclosure | Private storage, redaction, no personal data in Git |
+| SQLite data loss | Tracker unavailable | Consistent backup, restore drill, one-host topology |
+| UI fails quality target | Poor usability | Visual gate and early owner walkthrough |
+| Weak extraction on PDFs | Incomplete comparison | Parse preview, unknown labels, OCR deferred |
+| Name collision | Rebranding work | Domain/trademark check before public brand launch |
+| Production host not ready | Hosted release delayed | Accurate local pilot label; host remains prerequisite |
+
+## Decision log
+
+D01 uses the FDE sequence Embed, Solve, Generalize, Productize, adapted to the owner's accelerated path. D02 separates application data and history from the finance project. D03 preserves original descriptions and versions. D04 keeps eligibility outside the average fit score. D05 implements lexical RAG before embeddings. D06 makes MCP local/read-only. D07 uses descriptive analytics and truthful small-sample reporting. D08 keeps product branding configurable so a later name change does not require schema migration.
+
+## Open decisions
+
+Select local or hosted model after hardware and privacy review. Select production host, domain and authentication provider. Confirm repository visibility. Confirm whether an approved private API exists for any premium source. Obtain owner sample jobs/resumes without committing them. These are implementation inputs rather than reasons to stop independent document preparation.
+
+## Release evidence ledger
+
+| Gate | Required evidence | Baseline state |
+| --- | --- | --- |
+| Document preparation | Matched MD/DOCX and visual QA report | Generated and checked during authoring; consult manifest |
+| Source publication | Local SHA matches remote SHA | Pending owner Git commands |
+| Local application | Setup and end-to-end workflow evidence | Not implemented in document package |
+| Tests | Commit-linked test report | Not run for application |
+| AI evals | Dataset, versions and threshold results | Planned |
+| UI review | Screenshots and owner walkthrough | Concept only |
+| Recovery | Timed restore and integrity report | Planned |
+| Production | URL, access check, health and deployed SHA | Not deployed |
+
+## Source and naming notes
+
+Sandhātā draws inspiration from the Vishnu Sahasranama, with an interpreted connection between actions and their results. The English acronym is an original product expansion, not a literal translation. Traditional commentary varies. See https://www.sadagopan.org/ebook/pdf/Vishnu%20Sahasranama%20v1.pdf. Prior naming research found existing uses of Sandhi AI and Sthiraa; no domain/trademark clearance is claimed for the selected name.
+
+## Verified source references
+
+Access checked October 26 2026. Recheck access conditions before enabling a connector.
+
+- Remotive API: https://github.com/remotive-com/remote-jobs-api
+- Greenhouse Job Board API: https://docs.greenhouse.io/job-board.html
+- Lever Postings API: https://github.com/lever/postings-api
+- Ashby public postings: https://developers.ashbyhq.com/docs/public-job-posting-api
+- LinkedIn automated activity policy: https://www.linkedin.com/help/linkedin/answer/a1340567/automated-activity-on-linkedin?lang=en
+- Ladders terms: https://www.theladders.com/corporate/terms
+- Indeed developer agreement: https://docs.indeed.com/legal-terms/developer-agreement
+- LangGraph overview: https://docs.langchain.com/oss/python/langgraph/overview
+- Streamlit container deployment: https://docs.streamlit.io/deploy/tutorials/docker
+- MCP security: https://modelcontextprotocol.io/docs/2025-11-25/tutorials/security/security_best_practices
+- Promptfoo assertions: https://www.promptfoo.dev/docs/configuration/expected-outputs/
+- Langfuse self hosting: https://langfuse.com/self-hosting
