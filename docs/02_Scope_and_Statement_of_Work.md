@@ -1,6 +1,6 @@
 # Sandhātā Scope and Statement of Work
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
@@ -33,7 +33,7 @@ WP1 defines charter, contracts, data model and visual system. WP2 implements int
 
 ## Explicit limitations
 
-No commitment to automated collection from paid LinkedIn, Ladders or Indeed sessions. No automatic employer submission, outreach, mailbox integration, browser extension, OCR, multi-user tenancy or hiring prediction. Advanced analytics in v1 means descriptive cohort and pipeline analysis; predictive models require more data and validation.
+No commitment to automated collection from paid LinkedIn, Ladders or Indeed sessions. No automatic employer submission, outreach, mailbox integration, browser extension, OCR, public self-service registration, cross-household collaboration or hiring prediction. Advanced analytics in v1 means descriptive cohort and pipeline analysis; predictive models require more data and validation.
 
 ## Delivery priorities
 
@@ -42,3 +42,16 @@ P0 is intake, full description fidelity, resume selection, evidence comparison, 
 ## Dependencies and change control
 
 Owner supplies representative resumes and jobs privately. Runtime, model endpoint, Git authentication and deployment access must be available. A new connector, hosting platform or UI framework change is estimated against the remaining two-day budget. Record changes in decisions with rationale, acceptance impact, owner and date. Acceptance is evidenced in the release checklist; no implied financial or business outcome warranty.
+
+## Multi user scope and acceptance
+
+| ID | Required capability | Acceptance evidence |
+| --- | --- | --- |
+| R15 | Invite-only family identities | Two members can sign in independently; an uninvited identity is denied |
+| R16 | Private user workspaces | Member A cannot search, download, compare or mutate member B records |
+| R17 | Administrator console | Only active administrators can manage members and system operations |
+| R18 | Revocation and permissions | Suspension or demotion blocks the next protected operation, including queued work |
+| R19 | Audited housekeeping | Cleanup uses bounded previews, confirmation, leases and immutable audit events |
+| R20 | Family production gate | Concurrent-session, cache isolation, PostgreSQL RLS and restore tests pass |
+
+R15 through R20 are P0 for a family release. The administrator guide in document 22 owns the detailed permissions and operating procedures. Routine administration excludes member career-content inspection and impersonation. Resume/job sharing between members is deferred; all imported and derived career records are private by default.

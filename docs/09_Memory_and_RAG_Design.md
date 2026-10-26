@@ -1,6 +1,6 @@
 # Sandhātā Memory and RAG Design
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
@@ -21,7 +21,7 @@ Persistent memory stores explicit owner preferences, imported job versions, resu
 
 ## Indexing pipeline
 
-Parse text, preserve a canonical normalized text representation, split at headings and bullet boundaries, and retain parent version, section and character offsets. Target 300 to 600 tokens per passage with small overlap only when needed. Quotes and offsets refer to canonical stored text; the original payload remains separate. FTS5 indexes passage text with UNICODE tokenization; normalized skill aliases such as PostgreSQL/Postgres improve recall without rewriting the source evidence.
+Parse text, preserve a canonical normalized text representation, split at headings and bullet boundaries, and retain parent version, section and character offsets. Target 300 to 600 tokens per passage with small overlap only when needed. Quotes and offsets refer to canonical stored text; the original payload remains separate. PostgreSQL indexes authorized passage tsvectors with GIN and ranks using ts_rank. Explicit skill aliases handle punctuation-heavy skills such as C++ and C# and variants such as PostgreSQL/Postgres without rewriting source evidence. Owner scope and RLS apply before ranking.
 
 ## Retrieval pipeline
 
@@ -40,3 +40,11 @@ Preference changes affect new runs; prior results retain prior inputs. Job refre
 ## Privacy and future semantic search
 
 Do not send contact details to hosted models when not needed. Keep private uploads and indexes outside the repository, with OS permissions and encrypted host storage. If measured lexical recall is inadequate, add local embeddings and pgvector after selecting PostgreSQL or a measured local vector option. Embedding indexes inherit the same version filters, deletion rules and privacy restrictions. RAG quality is evaluated using the queries and gates in document 08.
+
+## Multi user memory isolation
+
+Every preference, imported job, description, passage, resume, match, tracker event, follow-up, task and conversation checkpoint belongs to tenant_id and owner_user_id. Only public provider payloads may be cached across users. Public source facts do not make personalized saved searches or notes public.
+
+PostgreSQL full-text queries apply the authenticated owner scope in SQL/RLS before ranking or limiting. No shared FTS index result set may be filtered only after retrieval, because ranking, snippets and counts can disclose other members' data. Conversations and checkpoints use tenant/user/run keys. Embeddings, if added, require the same pre-retrieval isolation and deletion rules.
+
+Administration queries expose account, storage and operational metadata only. Per-member career analytics remain private; household metrics aggregate system usage rather than resumes, skill gaps or application outcomes. Erasure removes active files/indexes/checkpoints and private derived content; backup tombstones survive until affected backups expire. Never cascade deletion from a shared public feed cache into unrelated member records.

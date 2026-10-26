@@ -1,0 +1,32 @@
+name: sandhata
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: sandhata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD:?Run bootstrap_local.py first}
+    ports: ["127.0.0.1:15432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./runtime/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sandhata"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.0
+    command: ["start-dev", "--import-realm", "--hostname=http://localhost:18180"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: operator
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_OPERATOR_PASSWORD:?Run bootstrap_local.py first}
+    ports: ["127.0.0.1:18180:8080"]
+    volumes:
+      - ./runtime/keycloak:/opt/keycloak/data/import:ro
+      - keycloakdata:/opt/keycloak/data
+    restart: unless-stopped
+volumes:
+  pgdata:
+  keycloakdata:

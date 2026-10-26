@@ -9,8 +9,8 @@ NS={'w':'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
 RNS={'r':'http://schemas.openxmlformats.org/package/2006/relationships'}
 manifest_path=ROOT/'deliverables/manifest.json'
 manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
-renders=json.loads((ROOT/'deliverables/qa/render_results.json').read_text(encoding='utf-8'))
-assert len(renders)==22 and all(x['returncode']==0 and x['pages']>0 for x in renders)
+renders=json.loads((ROOT/'deliverables/qa/v0.2/render_results.json').read_text(encoding='utf-8'))
+assert len(renders)==len(manifest['documents']) and all(x['returncode']==0 and x['pages']>0 for x in renders)
 issues=[]; checked=0; links=0
 def norm(s): return ' '.join(s.split())
 for item in manifest['documents']:
@@ -46,14 +46,14 @@ assert not issues,issues
 manifest['qa_status']='rendered_and_visually_reviewed'
 manifest['total_rendered_pages']=sum(x['pages'] for x in renders)
 manifest_path.write_text(json.dumps(manifest,indent=2),encoding='utf-8')
-report={'document_pairs':22,'rendered_pages':manifest['total_rendered_pages'],
+report={'document_pairs':len(manifest['documents']),'rendered_pages':manifest['total_rendered_pages'],
         'content_lines_checked':checked,'local_word_links_checked':links,
         'broken_links':0,'content_mismatches':0,'paragraph_border_residue':0,
         'visual_review':'Every final page reviewed; targeted rerenders followed formatting corrections',
-        'scope':'Document quality only; application tests and AI evaluations are not executed',
-        'application_status':'design_only','github_status':'local_preparation_owner_push_pending'}
+        'scope':'Document quality; application verification is separately recorded in deliverables/verification',
+        'application_status':'local_pilot_experimental_ai','github_status':'local_preparation_owner_push_pending'}
 (ROOT/'deliverables/quality_report.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
-archive=ROOT/'deliverables/Sandhata_FDE_Document_Package_v0.1.zip'
+archive=ROOT/'deliverables/Sandhata_FDE_Document_Package_v0.2.zip'
 files=[ROOT/'README.md',ROOT/'.gitignore',manifest_path,ROOT/'deliverables/quality_report.json']
 for folder in ['docs','deliverables/word','scripts']:
     files.extend(p for p in (ROOT/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts)

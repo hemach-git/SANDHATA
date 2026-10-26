@@ -1,0 +1,72 @@
+{
+  "model": "gpt-oss:20b",
+  "scope": "Three synthetic smoke cases, not a full production quality evaluation",
+  "results": [
+    {
+      "case": "direct_evidence",
+      "outcome": "passed",
+      "score": 72.7,
+      "requirements": [
+        {
+          "category": "required_skills",
+          "requirement_quote": "Python",
+          "status": "supported",
+          "resume_quote": "Built Python pipelines.",
+          "rationale": "Built Python pipelines.",
+          "job_offset": 10,
+          "resume_offset": 0
+        },
+        {
+          "category": "preferred_skills",
+          "requirement_quote": "Kubernetes",
+          "status": "not_evidenced",
+          "resume_quote": "",
+          "rationale": "No evidence of Kubernetes experience in the resume.",
+          "job_offset": 29,
+          "resume_offset": null
+        }
+      ],
+      "trace": [
+        {
+          "component": "fit_analyst",
+          "duration_ms": 26813,
+          "attempt": 1,
+          "input_tokens": 722,
+          "output_tokens": 130
+        }
+      ],
+      "seconds": 26.8
+    },
+    {
+      "case": "missing_skill",
+      "outcome": "passed",
+      "score": 0.0,
+      "requirements": [
+        {
+          "category": "required_skills",
+          "requirement_quote": "Python.",
+          "status": "not_evidenced",
+          "resume_quote": "",
+          "rationale": "Resume does not mention Python",
+          "job_offset": 10,
+          "resume_offset": null
+        }
+      ],
+      "trace": [
+        {
+          "component": "fit_analyst",
+          "duration_ms": 12843,
+          "attempt": 1,
+          "input_tokens": 709,
+          "output_tokens": 44
+        }
+      ],
+      "seconds": 12.8
+    },
+    {
+      "case": "injection",
+      "outcome": "safely_withheld",
+      "seconds": 19497.8
+    }
+  ]
+}

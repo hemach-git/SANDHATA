@@ -1,6 +1,6 @@
 # Sandhātā Test Plan
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
@@ -35,7 +35,7 @@ Test contracts, calculations, storage and failure behavior with deterministic fi
 
 ## Layers and fixtures
 
-Unit tests cover filter normalization, duplicate keys, quote offsets, scoring, date conversion and cohort arithmetic. Integration tests use a temporary SQLite database and file root with connector HTTP responses recorded from permitted or synthetic examples. UI tests exercise upload, resume selector, evidence expansion, tracker editing, global search and chart filters. Use Streamlit's app testing surface where supported and browser tests for interactions that need a browser.
+Unit tests cover filter normalization, duplicate keys, quote offsets, scoring, date conversion and cohort arithmetic. Integration tests use a temporary PostgreSQL database and file root with connector HTTP responses recorded from permitted or synthetic examples. UI tests exercise upload, resume selector, evidence expansion, tracker editing, global search and chart filters. Use Streamlit's app testing surface where supported and browser tests for interactions that need a browser.
 
 ## Visual and accessibility review
 
@@ -48,3 +48,22 @@ On the declared test machine with 500 saved jobs, target p95 saved-job search un
 ## Release gate
 
 All critical T cases pass; no unresolved critical privacy, security or data-loss defect; eval gate passes; owner can complete the real workflow. A skipped live connector test is reported as not verified, with the affected capability labeled accordingly. Regression failures need reproduction, fix and a targeted rerun before broad release validation.
+
+## Family isolation and administrator cases
+
+| ID | Scenario | Required result |
+| --- | --- | --- |
+| T21 | Uninvited OIDC identity | Sign-in establishes no application membership |
+| T22 | Replayed, expired or wrong-identity invitation | Redemption denied without activating membership |
+| T23 | Member A guesses member B record IDs | All service, page, download and export paths deny access |
+| T24 | Two users issue identical queries | Private caches and assessments remain separate |
+| T25 | Missing RLS scope or cross-owner foreign key | Query/write denied; no data leaked through error details |
+| T26 | Member invokes admin callback directly | Denied server-side; hiding navigation alone is insufficient |
+| T27 | Suspend or demote an active account | Next protected operation and queued step denied |
+| T28 | Concurrent removal of final administrators | Serialized change preserves at least one active admin |
+| T29 | Retry maintenance command | One bounded idempotent job and audit record |
+| T30 | Cleanup preview and cancellation | Counts scoped correctly; cancellation prevents further batches |
+| T31 | Five simultaneous sessions | No identity, file, cache, worker or connection-pool scope leakage |
+| T32 | Logout/login as another member in same browser | No prior member state or download becomes visible |
+
+Use two synthetic member accounts, an administrator and an uninvited identity. Run integration tests against a real disposable PostgreSQL instance with the production application role and forced RLS. Include error/rollback connection-pool reuse, manipulated owner fields and CSV/MCP/private-file paths. Repeat key checks after backup restore and schema migration. No family-accessible release passes while T21 through T32 are failed or unrun.

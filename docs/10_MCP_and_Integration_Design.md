@@ -1,6 +1,6 @@
 # Sandhātā MCP and Integration Design
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
@@ -44,3 +44,11 @@ Use the official SDK and test against the chosen client. Do not forward arbitrar
 ## Acceptance and expansion
 
 Contract tests prove schema validity, limit enforcement, missing-record handling and read-only operation. A local smoke test lists tools and reads one synthetic job. Source acceptance requires one real call with attribution and a recorded access review. A connector listed in the architecture but not exercised is marked planned. Future premium APIs must have documented access, permitted storage and a tested refresh policy before activation.
+
+## Authenticated MCP scope
+
+The proposed local stdio adapter is bound at launch to a short-lived owner-authorized capability issued after application sign-in. It cannot choose a user by trusting an environment variable, caller-supplied owner_id or tool argument. Every call resolves the bound Principal, current membership and auth_version; missing or expired capability fails closed. Bootstrap secrets are not supplied on a command line or logged. If this binding is not implemented, disable MCP for the family release rather than exposing all local data.
+
+The four read-only tools remain member-scoped. They cannot read other member records, account lists or administrative audit data. Administrative mutations are not exposed through MCP in v1. Remote shared MCP remains deferred until its independent OAuth authorization and transport controls are implemented and tested. Application OIDC cookies are not forwarded as general MCP bearer tokens.
+
+Each family member uses premium job portals in their own browser. Sandhātā stores neither portal passwords nor session cookies. Public Remotive refresh is one centrally cached operation for the deployment; ten users clicking Refresh cannot multiply its documented rate budget.

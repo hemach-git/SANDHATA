@@ -2,26 +2,44 @@
 
 **Search, Analyze, Navigate, Discover, Highlight, Apply, Track, Advance.**
 
-Personal career intelligence for supported job discovery, assisted premium-portal imports, evidence-based resume comparison, application tracking and descriptive analytics.
+An invite-only family job-search workspace with private resumes, original posting snapshots, evidence-grounded comparisons, an application tracker, analytics and an administrator console.
 
-## Current status
+## Current release
 
-This repository begins with the FDE design and delivery baseline. Application code, automated tests, model evaluations and production deployment are not yet implemented. The October 26–27 2026 schedule is a target subject to verification gates.
+Version 0.2 is a working localhost pilot. It uses real Keycloak OIDC, PostgreSQL forced row-level security, Streamlit, a durable LangGraph comparison worker, local Ollama, Plotly, and authenticated private downloads. Automated tests use a separate disposable database. AI comparisons remain experimental pending the full reviewed evaluation dataset. Public production deployment is not complete.
 
-## Documentation
+Start with [the implementation and operating handoff](docs/23_Implementation_and_Operating_Handoff.md), then [the document index](docs/00_Document_Index.md). Paired Word files are in `deliverables/word`. Design documents record the intended target; document 23 records the implemented subset and release limits.
 
-Start with [the document index](docs/00_Document_Index.md). There are 22 matching Markdown and Word documents, including architecture and sequence diagrams and individual agent guides. Word versions are in `deliverables/word`.
+## Run locally on Windows
 
-The planned application uses Streamlit, Python, LangGraph, SQLite FTS5, versioned evidence and a configurable model adapter. Remotive and supported employer feeds provide automated ingestion; LinkedIn, Ladders and Indeed use assisted import unless approved programmatic access is established.
+Prerequisites: Python 3.12, Docker Desktop/Engine, Git and Ollama with an installed compatible structured-output model. Use a separate checkout outside BRIHASPATI.
 
-## GitHub
+```powershell
+Set-Location -LiteralPath 'C:\Users\Chepuri\Documents\ChatGPT\sandhata'
+py -3.12 -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.lock
+powershell -ExecutionPolicy Bypass -File scripts/start_local.ps1
+```
 
-Destination: https://github.com/hemach-git/sandhata
+On this machine the environment and services are already installed. Open http://localhost:18501 and use the private `runtime/LOCAL_ACCESS.md` guide for pilot credentials. Never commit or share that file. All listener ports are loopback-only. Other devices cannot access this localhost deployment.
 
-The owner runs publication commands from [the GitHub guide](docs/11_GitHub_and_Collaboration_Guide.md). Check origin and the repository root before staging. Private resumes, job-history databases, tokens and environment files must remain outside Git.
+## Verify
 
-## Regenerate the documents
+```powershell
+.venv\Scripts\python.exe scripts/run_tests.py
+.venv\Scripts\python.exe scripts/live_evals.py
+.venv\Scripts\python.exe scripts/backup.py
+docker build -t sandhata:0.2.0 .
+```
 
-Use the authoring Python environment with `python-docx` and Pillow, then run `python scripts/build_documents.py`. Existing Markdown is the editable source of record; the generator preserves its edits and rebuilds Word files, diagram images and the manifest. The document index is regenerated. The optional `--reset-sources` flag deliberately replaces Markdown with the original embedded baseline and must only be used when that reset is intended. Rendering and visual QA are a separate step.
+The live evaluation command uses synthetic text with your local model. Backups are encrypted; keep `runtime/backup.key` separately in a secure vault. The backup script performs an isolated restore drill and never overwrites the active database. Identity-provider backup and real restore remain separate operator procedures.
 
-Sandhātā is the display name; `sandhata` is the ASCII identifier. The English acronym is an original branding expansion, not a Sanskrit translation. Domain and trademark availability have not been verified.
+## Supported sources
+
+Remotive public API uses a deployment-wide six-hour cache. Greenhouse, Lever and Ashby adapters take known employer boards. LinkedIn, Indeed and Ladders open searches in the user's own browser and support full-description manual import. Premium subscriptions do not imply API rights. Employer adapter breadth is implemented but not live-certified for every employer.
+
+## Deployment and GitHub
+
+`Dockerfile`, `compose.production.yaml` and `deploy/Caddyfile` package the application tier. Production requires actual DNS/host access, a production OIDC provider, PostgreSQL roles, persistent storage and private secrets. Do not expose the local Keycloak development container. The operating handoff supplies the checklist.
+
+Repository: https://github.com/hemach-git/sandhata. The user runs publication commands from [the GitHub guide](docs/11_GitHub_and_Collaboration_Guide.md). Private files are ignored and excluded from container builds. Sandhātā is the display name; `sandhata` is the ASCII identifier. The branding acronym is original and is not a Sanskrit translation.

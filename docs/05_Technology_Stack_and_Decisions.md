@@ -1,6 +1,6 @@
 # Sandhātā Technology Stack and Decisions
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
@@ -10,11 +10,11 @@ Select the smallest stack that supports all critical acceptance paths. Pin resol
 
 | Layer | Selection | Reason |
 | --- | --- | --- |
-| UI | Streamlit and theme CSS within supported boundaries | Fast personal dashboard delivery |
+| UI | Streamlit and theme CSS within supported boundaries | Fast authenticated family dashboard delivery |
 | Charts | Plotly | Interactive funnels, bars and trends |
 | Validation | Pydantic | Explicit input and output contracts |
 | Workflow | LangGraph OSS | Typed state and bounded graph execution |
-| Storage | SQLite FTS5, SQLAlchemy, Alembic | Structured memory, search and migrations |
+| Storage | PostgreSQL full-text search, SQLAlchemy, Alembic | Structured memory, search and migrations |
 | Fetch | HTTPX and Beautiful Soup | Supported APIs and permitted HTML |
 | Resume parsing | pypdf and python-docx | Text PDF and Word support |
 | Model runtime | Ollama behind provider adapter | Local inference option |
@@ -30,7 +30,7 @@ GitHub is a hosted service choice, not an open-source dependency claim. Hosted m
 
 ## Decisions and alternatives
 
-ADR01 chooses SQLite for one owner and one host; PostgreSQL is the migration path for concurrent replicas. ADR02 chooses lexical retrieval plus structured evidence because exact skills and source citations matter more than broad semantic recall in v1. Embeddings are a later enhancement, not a prerequisite for RAG. ADR03 chooses Streamlit over React to protect the schedule; the UI gate still tests layout and accessibility. ADR04 chooses service functions over a separate FastAPI layer, avoiding duplicated validation. ADR05 keeps MCP local and read-only.
+ADR01 is superseded by ADR06: family access requires PostgreSQL from the first deployable build. ADR02 chooses lexical retrieval plus structured evidence because exact skills and source citations matter more than broad semantic recall in v1. Embeddings are a later enhancement, not a prerequisite for RAG. ADR03 chooses Streamlit over React to protect the schedule; the UI gate still tests layout and accessibility. ADR04 chooses service functions over a separate FastAPI layer, avoiding duplicated validation. ADR05 keeps MCP local and read-only.
 
 ## Model selection
 
@@ -42,4 +42,10 @@ Use a project-local virtual environment and a lock generated from declared requi
 
 ## Expansion triggers
 
-Add PostgreSQL for multiple processes needing sustained concurrent writes, embeddings for measured recall gaps, FastAPI for external application clients, and a separate tracing platform when JSON runs no longer support debugging. Each change gets an ADR, migration plan and eval rerun rather than being added solely for architectural appearance.
+Add embeddings for measured recall gaps, FastAPI for external application clients, and a separate tracing platform when JSON runs no longer support debugging. Each change gets an ADR, migration plan and eval rerun rather than being added solely for architectural appearance.
+
+## Family deployment decisions
+
+ADR06 supersedes the SQLite/FTS5 choice: use PostgreSQL full-text search and RLS with SQLAlchemy/Alembic. Test against PostgreSQL rather than substituting SQLite in integration tests. OIDC uses Streamlit's supported authentication surface with explicit application authorization. Reuse an available Google/Microsoft OIDC provider for the fastest setup; Keycloak is the open-source self-hosted alternative when its setup and operations can fit the delivery budget. Password storage and password resets remain the identity provider's responsibility.
+
+The administrator console is an authenticated application page backed by deterministic services, not an unrestricted administrative agent. PostgreSQL, identity configuration and isolation tests move onto the critical path. Verify dependency versions for the selected Streamlit authentication APIs in the implementation lock.

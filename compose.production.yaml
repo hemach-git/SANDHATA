@@ -1,0 +1,53 @@
+# Production application tier. Supply external PostgreSQL, OIDC and model endpoints privately.
+name: sandhata-production
+x-app: &app
+  image: sandhata:0.2.0
+  build: .
+  user: "10001:10001"
+  env_file: ./runtime/production/app.env
+  restart: unless-stopped
+  read_only: true
+  tmpfs: [/tmp]
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: [ALL]
+  volumes:
+    - ./runtime/production/data:/app/runtime/data
+  networks: [private]
+services:
+  web:
+    <<: *app
+    volumes:
+      - ./runtime/production/data:/app/runtime/data
+      - ./runtime/production/secrets.toml:/app/.streamlit/secrets.toml:ro
+    environment:
+      SANDHATA_WORKER_DATABASE_URL: ""
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:18501/_stcore/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  api:
+    <<: *app
+    environment:
+      SANDHATA_WORKER_DATABASE_URL: ""
+    command: ["python", "-m", "uvicorn", "sandhata.private_api:app", "--host", "0.0.0.0", "--port", "18502"]
+  worker:
+    <<: *app
+    env_file: ./runtime/production/worker.env
+    command: ["python", "-m", "sandhata.worker"]
+  proxy:
+    image: caddy:2-alpine
+    ports: ["80:80", "443:443"]
+    environment:
+      SANDHATA_HOSTNAME: ${SANDHATA_HOSTNAME:?Set your actual DNS hostname}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+      - caddyconfig:/config
+    networks: [private]
+    restart: unless-stopped
+networks:
+  private:
+volumes:
+  caddydata:
+  caddyconfig:

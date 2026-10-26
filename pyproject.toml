@@ -1,0 +1,7 @@
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+markers = ["integration: requires the isolated Sandhata PostgreSQL instance", "live: calls a live provider or local model"]
+
+[tool.ruff]
+line-length = 120

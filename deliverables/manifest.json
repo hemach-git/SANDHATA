@@ -1,207 +1,225 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "date": "2026-10-26",
   "documents": [
     {
       "name": "00_Document_Index",
       "markdown": "docs/00_Document_Index.md",
       "word": "deliverables/word/00_Document_Index.docx",
-      "source_sha256": "18831612c23e6efa262056e172bf8f58d44c64f2e9ad2df0921a60d3fff9d94f",
-      "words": 532,
-      "word_sha256": "82bd9ae1c04fc4a9a9a1aafe64a18706a29e248cb418924694bde9945470ed9e",
+      "source_sha256": "cb1b927a942324bdbdc226c97dd15eb12b0f7c0af20ac02532a43d8bab7f7fe5",
+      "words": 566,
+      "word_sha256": "da77b6e9090af3bba429a4c62124e4a544dc11bc16974f709d74406d93b54483",
       "rendered_pages": 2
     },
     {
       "name": "01_Project_Charter",
       "markdown": "docs/01_Project_Charter.md",
       "word": "deliverables/word/01_Project_Charter.docx",
-      "source_sha256": "47c1fa34d5d13894e771447912af6fa8e2e9a82dda2e5265ac5d18fefa36d3cf",
-      "words": 543,
-      "word_sha256": "6e058fae193589eaec51cf25d96c854615bef62f609b81ad3a0d1e2c2aa562c7",
+      "source_sha256": "5a9e2aed25a711ba9f10a1350269432fb35ca02ad1e3d99d6ee8ad8daa3b7892",
+      "words": 717,
+      "word_sha256": "6ebbe7e8c453c46ba97b60887fb7dd85f6109e4d707ffb6a333482eecd3c39c4",
       "rendered_pages": 2
     },
     {
       "name": "02_Scope_and_Statement_of_Work",
       "markdown": "docs/02_Scope_and_Statement_of_Work.md",
       "word": "deliverables/word/02_Scope_and_Statement_of_Work.docx",
-      "source_sha256": "9d9333f71be95182e6caafdc2a5f0d94360b80585a5bad3a444b2cf7979f17d7",
-      "words": 590,
-      "word_sha256": "71bff0333bcf1f58868fd5b1b2d88cc148a43b627b75c3ce3a0a8cf96d76527a",
-      "rendered_pages": 2
+      "source_sha256": "97d0c29dcdb33dab2f370399353dba7f3f50dda637fc2c265a37ecb248d09418",
+      "words": 768,
+      "word_sha256": "a5bc8829d340024142bb22e66c2c1063516c2f3333101aa5704d24974d09f31e",
+      "rendered_pages": 3
     },
     {
       "name": "03_Low_Level_Design_and_Architecture",
       "markdown": "docs/03_Low_Level_Design_and_Architecture.md",
       "word": "deliverables/word/03_Low_Level_Design_and_Architecture.docx",
-      "source_sha256": "0735ad232e1ba3b6eb57f9441c669a467769b838370106206cbf063724925770",
-      "words": 947,
-      "word_sha256": "5f265e6e4e3aa146e73992972ee6b638ed08765f00bd100217f4b20374b1b6b4",
-      "rendered_pages": 4
+      "source_sha256": "fdd6b480c8a9df604431bb256851a0b641ac76998e629de354d092b8789386a3",
+      "words": 1530,
+      "word_sha256": "7743f306115afa6a97f7ef51bc2d5aa829708e1aa38bfdba2c581a54cfafc0d5",
+      "rendered_pages": 5
     },
     {
       "name": "04_Sequence_Flows",
       "markdown": "docs/04_Sequence_Flows.md",
       "word": "deliverables/word/04_Sequence_Flows.docx",
-      "source_sha256": "d27e27626b4fda9f90b4594598e3f95260a7b878302356df231e5008ad4c61f8",
-      "words": 535,
-      "word_sha256": "502113fd5129fc37293384d09808483334929f1d3b11f95fb14a71eba7699cea",
-      "rendered_pages": 3
+      "source_sha256": "2cb7c27a28336dff22d956bf332c37793c89bf5c149c3f7721e53301597cf33b",
+      "words": 682,
+      "word_sha256": "ab829e064a1eca6846e7a872f1c77f52695aa135c1dd9756993bf064644728e2",
+      "rendered_pages": 4
     },
     {
       "name": "05_Technology_Stack_and_Decisions",
       "markdown": "docs/05_Technology_Stack_and_Decisions.md",
       "word": "deliverables/word/05_Technology_Stack_and_Decisions.docx",
-      "source_sha256": "54abfec0ea62aa37d5cb597dc183f3c831886bb85053d892d925fd991718c5ba",
-      "words": 622,
-      "word_sha256": "e3a0bc610d660d58cf770c22bd07393914641ea3996a285f10017b1cb0362ef8",
+      "source_sha256": "789070a80424f990ed30aff501f1902caa69a2bd6d31b357bf672985b7f6181c",
+      "words": 727,
+      "word_sha256": "c5e28060b5bbf9d2d9a66f413f2d4710db5cd11d50009653346b52b6ec09fdb2",
       "rendered_pages": 2
     },
     {
       "name": "06_Design_and_Accelerated_Build_Plan",
       "markdown": "docs/06_Design_and_Accelerated_Build_Plan.md",
       "word": "deliverables/word/06_Design_and_Accelerated_Build_Plan.docx",
-      "source_sha256": "a4436165d4f4334f9d9d492ff5715d587a94ef3071702a8e7ca90a19e02076dc",
-      "words": 639,
-      "word_sha256": "a14d389955b95810cf5cdcdf8a32eeccd419b5b861dae86c222ba51aaa9d4220",
+      "source_sha256": "2477421f582eafe2dfecb7ff44a29f9cc5649294b6efeb188df5977d5c4845a5",
+      "words": 808,
+      "word_sha256": "831bb09f1125b9883ccef3b19550a785b1e3a82fad416dc1b88f588117fa1b3c",
       "rendered_pages": 2
     },
     {
       "name": "07_Test_Plan",
       "markdown": "docs/07_Test_Plan.md",
       "word": "deliverables/word/07_Test_Plan.docx",
-      "source_sha256": "608085b156355d93ffdc6305b1be76bfc28355041ff94d7935afe72ed2549644",
-      "words": 704,
-      "word_sha256": "c86908d7300fb1b16c6b6481cfd2459099d49e1df09a58f01ec35be00228e0d4",
-      "rendered_pages": 2
+      "source_sha256": "983083f59f00e1bfb0efc8a266e472c52b21ad5b63a3d7909ed3b39d56f3204b",
+      "words": 990,
+      "word_sha256": "1b345d19b8bfff93a0f42bbc9be871c0ea17109fafb66ea4b2afc8f64cfbe676",
+      "rendered_pages": 3
     },
     {
       "name": "08_AI_Evaluation_Plan",
       "markdown": "docs/08_AI_Evaluation_Plan.md",
       "word": "deliverables/word/08_AI_Evaluation_Plan.docx",
-      "source_sha256": "9c217ec40afdf47a31306ac6fa4c8ed489e7edd42d57f60d01838e32dd58c591",
-      "words": 594,
-      "word_sha256": "e958a9a808d09f1f9374809f9dc51e84e72cbed805a01d57257d93eed10a2ff7",
+      "source_sha256": "18e3737923026f129c58c42792ebaf7ce38a4dddd0adae6dbca6bf50abbe9cae",
+      "words": 708,
+      "word_sha256": "16d5dba6c3f5da15a7737c8846ab5215486dd93bc1cda0480807e0262fe4e168",
       "rendered_pages": 2
     },
     {
       "name": "09_Memory_and_RAG_Design",
       "markdown": "docs/09_Memory_and_RAG_Design.md",
       "word": "deliverables/word/09_Memory_and_RAG_Design.docx",
-      "source_sha256": "0f2e2432e0eb81afbb32ed68dd3a6479078122f1319e93b32858fc88ecadf064",
-      "words": 613,
-      "word_sha256": "b12d0d6da0c39049a55b45f72634380e64f84215db7ee125fe34434a9e88a6f1",
+      "source_sha256": "efc3cc7cee159f1cd7da82437b14cb8da8274d875f5244a46698849c94364c71",
+      "words": 785,
+      "word_sha256": "ecb1d0585222949660dd4105037a06d3ed476847f2845ebd9aaf8fa773eea66f",
       "rendered_pages": 2
     },
     {
       "name": "10_MCP_and_Integration_Design",
       "markdown": "docs/10_MCP_and_Integration_Design.md",
       "word": "deliverables/word/10_MCP_and_Integration_Design.docx",
-      "source_sha256": "72a1a4d7d06f7a79bd091fce5d8d6a3e222864db1cdbc23a1cdfb67c94ca12a2",
-      "words": 601,
-      "word_sha256": "2af9eb30145210a30a37901693648e2e6a02cf18b2956a295038697b0e1e0623",
+      "source_sha256": "2ce70bc679de9a45454950b62c9a95b4963e8b7afa527f6def9219af581a17fa",
+      "words": 778,
+      "word_sha256": "6c5ff19716f404c9aabf877aa3fa24150a972dbdd6c590d67a5e87b2385d66da",
       "rendered_pages": 2
     },
     {
       "name": "11_GitHub_and_Collaboration_Guide",
       "markdown": "docs/11_GitHub_and_Collaboration_Guide.md",
       "word": "deliverables/word/11_GitHub_and_Collaboration_Guide.docx",
-      "source_sha256": "12976bfd7c17e2461967cb89887d099f3e55b431b2f0f32acd27ee99b2756be9",
-      "words": 501,
-      "word_sha256": "db337d14a4dc4f30734a80533e09dc99c4dc42b2fa017734052ba5448f6882ae",
+      "source_sha256": "708ce4c0304fd621f47bfcd12c9c4071e0f0ec226b89539939bf374dcaa6d022",
+      "words": 558,
+      "word_sha256": "7f42d344f971fc56268e54e7e3d33aa7481ac2d358ddbb5a679153baf34aed03",
       "rendered_pages": 2
     },
     {
       "name": "12_Observability_and_Operations",
       "markdown": "docs/12_Observability_and_Operations.md",
       "word": "deliverables/word/12_Observability_and_Operations.docx",
-      "source_sha256": "7ed517f03e9c048b8d1ca9af7e99b2dc4b0e128a07204ac8184035aa8276a161",
-      "words": 556,
-      "word_sha256": "712f34ee5bccd1003521e45ae0bbedb404e76f434e2ba59a76bc6ed195414fee",
+      "source_sha256": "0de7079038e47a315e6c2882810b1cfa44049d74738c3368aa6fbff0b089eb3d",
+      "words": 749,
+      "word_sha256": "e4dd0aeec80e8f346c1181d3e0416d90ccdd9838d7a762128caeb712a61c9ce0",
       "rendered_pages": 2
     },
     {
       "name": "13_UI_Design_and_User_Guide",
       "markdown": "docs/13_UI_Design_and_User_Guide.md",
       "word": "deliverables/word/13_UI_Design_and_User_Guide.docx",
-      "source_sha256": "450cafb5183efc2e4ff276811c7451f3558bd3cdddf92832c36ab3929056caa6",
-      "words": 617,
-      "word_sha256": "1e7c522ec2288ada8c1f8305b332f400b5b7894e6297cf48e72ad9aff9ca76fb",
-      "rendered_pages": 2
+      "source_sha256": "c7064cf58ba560bfe79ac22cad74e5331d08b66e6d64c8fd3baac06da6f50440",
+      "words": 817,
+      "word_sha256": "955c19791732932e11d5f1f302de58b96b7f65ef96eb1cb0b9822f1c3d36d1a9",
+      "rendered_pages": 3
     },
     {
       "name": "14_Analytics_Requirements_and_Design",
       "markdown": "docs/14_Analytics_Requirements_and_Design.md",
       "word": "deliverables/word/14_Analytics_Requirements_and_Design.docx",
-      "source_sha256": "b36d20271d087fc85052f84a02ed7bab970641691a1112539592003a359f3dc3",
-      "words": 674,
-      "word_sha256": "bb62d7d63b5df8d1bb20cdafa0a22b8004fd52c4f0fbdb5e1e3dbd3842d422d7",
+      "source_sha256": "8cf491aa5446d70ffaa15101697b7450735bbb828876f8d5cb9a7f2e931e5f02",
+      "words": 753,
+      "word_sha256": "309ae48cae5a41782d5a965f019f6e30f9e790237012499473a1bd41e4766f7f",
       "rendered_pages": 2
     },
     {
       "name": "15_Production_Deployment_and_Release",
       "markdown": "docs/15_Production_Deployment_and_Release.md",
       "word": "deliverables/word/15_Production_Deployment_and_Release.docx",
-      "source_sha256": "bd031c53208a4514c0f81ab6c660ba67320f1f34c6feb3e0e0a71448f8e52c25",
-      "words": 714,
-      "word_sha256": "249f8521c78695fec4f3be2cf808263bb6e4a8aa7f6725c4b2d8e593359a273d",
+      "source_sha256": "b2ab18186246d75ab72f8df99e73f75c062cd9e1eb06a70ee10845cfca46c6a0",
+      "words": 970,
+      "word_sha256": "02c3866edc29d8ebed51904e144d5331c4ef6cd314e2091cb8c21fe6d52e08ce",
       "rendered_pages": 3
     },
     {
       "name": "16_Coordinator_Agent_Guide",
       "markdown": "docs/16_Coordinator_Agent_Guide.md",
       "word": "deliverables/word/16_Coordinator_Agent_Guide.docx",
-      "source_sha256": "3d36359874a0e8d8e285c949983896dcecef85538bee43a3646841e8536cab92",
-      "words": 478,
-      "word_sha256": "e1787bfd6e71ce9c8dec7a962730a5e487789b7ecfb054475ff1157139548ec1",
+      "source_sha256": "c3f02b9f353ea6851479245017c0e13865028c72fec9385a9889e00adac62b6f",
+      "words": 642,
+      "word_sha256": "bed8d6efe38ff8e1f464f07a9976a9c35e1a100fb4f46186b9d31794d2ca8095",
       "rendered_pages": 2
     },
     {
       "name": "17_Search_and_Intake_Agent_Guide",
       "markdown": "docs/17_Search_and_Intake_Agent_Guide.md",
       "word": "deliverables/word/17_Search_and_Intake_Agent_Guide.docx",
-      "source_sha256": "5d60e11766b3f14403aa64e9bdfd6625b27af03633c1d171b0e7d69b07f9ae0f",
-      "words": 488,
-      "word_sha256": "6db35ff091c2e6cec37d8a6f53fddcac103e97631947d6e30d96ce2f365a7c4d",
+      "source_sha256": "ccb7228b469ae80bf50613c2474e2b161c145fa67cfe52c8f74578c0a44c595e",
+      "words": 652,
+      "word_sha256": "b4bf476e962a37192dc6e3a4a7ca9c37e8be6651e5d67cf10becafbdcdae1a77",
       "rendered_pages": 2
     },
     {
       "name": "18_Resume_Analyst_Agent_Guide",
       "markdown": "docs/18_Resume_Analyst_Agent_Guide.md",
       "word": "deliverables/word/18_Resume_Analyst_Agent_Guide.docx",
-      "source_sha256": "0d560a23c7118d2806f048fdf01d02c0dd278f07142bdf6cb21072bfb36bbe9e",
-      "words": 483,
-      "word_sha256": "5ae19620079e297200842e1e985e48fa5cd711df2256e8a4a2b55acf579488bb",
+      "source_sha256": "87a07bd4877834452c6b97c121b8c6b5707b63f2e18e6dc273167ac86275fa31",
+      "words": 647,
+      "word_sha256": "a8c12fd6ead2b1e7d50ce9144f91e996bf100a49ceaf85cc2b1b12b706dc4d7b",
       "rendered_pages": 2
     },
     {
       "name": "19_Fit_Analyst_Agent_Guide",
       "markdown": "docs/19_Fit_Analyst_Agent_Guide.md",
       "word": "deliverables/word/19_Fit_Analyst_Agent_Guide.docx",
-      "source_sha256": "ecf0de36df1d361a3e4a53a96802857bdfa8d28d209fb072d17707fa354d4fc3",
-      "words": 482,
-      "word_sha256": "ee7e723e798d9fcd9cdb9b0d7c51f0e7fa773ae269fcfbd297750e33d207d696",
+      "source_sha256": "e947b2b45faddc8fe578e0df4a7921f2934158cbadab58946d3980652899a6fc",
+      "words": 651,
+      "word_sha256": "ea17a0df7831d0dd97dd7c84244d6e4b53c2f95ee836d72acdf6f452237e1c84",
       "rendered_pages": 2
     },
     {
       "name": "20_Career_Assistant_Agent_Guide",
       "markdown": "docs/20_Career_Assistant_Agent_Guide.md",
       "word": "deliverables/word/20_Career_Assistant_Agent_Guide.docx",
-      "source_sha256": "dc52c86580c9aed2aeb3f220f48b40685923bfee3bec46604115ccf6325df8ac",
-      "words": 480,
-      "word_sha256": "c2634c83c5043c3e3068f3338753031d4e6e12dcf62da24f551e85ebe5401125",
+      "source_sha256": "0dcc28dc26424916ba44b993aabcc4ad69c7ddca613e386a5eca152dbfbff493",
+      "words": 644,
+      "word_sha256": "50d213ecebaf603cdec19bb049916f8c82d9db7023d45440951fe1592130e002",
       "rendered_pages": 2
     },
     {
       "name": "21_Risks_Decisions_and_Release_Evidence",
       "markdown": "docs/21_Risks_Decisions_and_Release_Evidence.md",
       "word": "deliverables/word/21_Risks_Decisions_and_Release_Evidence.docx",
-      "source_sha256": "dbfc46aba99bf9a1bcb33ee236e5282dd4eb844b7789e3ce643945aba4e08602",
-      "words": 670,
-      "word_sha256": "c80515e313a7561fe075620ba28174b0ea78c01fb21eeabcc97d36c90f3b2d93",
+      "source_sha256": "d310c4277e14d590ef776da14f82edbd49b03d9bd52b2681d5c68c331aea633c",
+      "words": 898,
+      "word_sha256": "9e079246eb5dcfb92e6ad122c690fc00491a1edcb42b42fce60a61206911419e",
       "rendered_pages": 3
+    },
+    {
+      "name": "22_Administrator_and_Family_Access_Guide",
+      "markdown": "docs/22_Administrator_and_Family_Access_Guide.md",
+      "word": "deliverables/word/22_Administrator_and_Family_Access_Guide.docx",
+      "source_sha256": "88b3da88f0a2fb5356820a0739983332750c122e56f7b49a03db0a76d55d0273",
+      "words": 1303,
+      "word_sha256": "8c6106e45543044079b8c1bafce3fc74862bdc0e6fd25422969f969252f5223d",
+      "rendered_pages": 4
+    },
+    {
+      "name": "23_Implementation_and_Operating_Handoff",
+      "markdown": "docs/23_Implementation_and_Operating_Handoff.md",
+      "word": "deliverables/word/23_Implementation_and_Operating_Handoff.docx",
+      "source_sha256": "d75860a60a36364bea9141e6725dc59b35ccbc229b420f2a1c04b1181e7216dc",
+      "words": 1490,
+      "word_sha256": "02af5e1fa192d807bc3221b158c1a8e5134559f141a8c40ec4310c2541b5e75c",
+      "rendered_pages": 4
     }
   ],
-  "application_status": "design_only",
+  "application_status": "local_pilot_experimental_ai",
   "qa_status": "rendered_and_visually_reviewed",
-  "total_rendered_pages": 49
+  "total_rendered_pages": 62
 }

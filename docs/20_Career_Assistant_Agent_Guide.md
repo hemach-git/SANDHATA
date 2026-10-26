@@ -1,6 +1,6 @@
 # Sandhātā Career Assistant Agent Guide
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
@@ -31,3 +31,11 @@ If asked which resume works better with only two applications per version, show 
 ## Verification and observability
 
 Evaluate answer citations, correct SQL routing, date cohorts, abstention and absence of unauthorized mutations. Test timezone edges and repeated user updates. Log intent class, chosen service, record IDs, query duration and outcome without private question text by default. Acceptance includes correct answers over the synthetic analytics fixture and a trace showing that an unapproved suggestion never mutated tracker state. Proposed module path is src/sandhata/agents/career.py.
+
+## Family permission contract
+
+All inputs carry a server-resolved Principal; tools and service code enforce its tenant, owner, active membership and auth_version. Never accept a model-provided owner_id or administrator role as authority. Every read, write, cache, checkpoint and model context is scoped before execution. A model cannot switch family members, activate an account, grant roles or run housekeeping.
+
+Only public provider payloads may be shared in cache. Resume evidence, imported descriptions, personal queries, tracker events and assessments remain private. Workers recheck membership before protected steps and stop on suspension. Missing scope fails closed. Administrator status does not grant access to another member's career content. Cross-user requests abstain or return a safe denial, even if a guessed record ID exists.
+
+Required verification includes member A requesting member B evidence, cache reuse, forged IDs/role instructions and a suspended user's queued run. Log opaque scope IDs and safe outcomes, never private prompt or resume text. Account management and cleanup belong to deterministic admin services, not this agent.

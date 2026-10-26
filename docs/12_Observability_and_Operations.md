@@ -1,6 +1,6 @@
 # Sandhātā Observability and Operations Guide
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
@@ -40,3 +40,11 @@ Keep sanitized logs for 14 days and checkpoints seven days initially. Retention 
 ## Future tracing platform
 
 Adopt OpenTelemetry and Langfuse core when richer cross-component debugging is needed and resource requirements fit the host. Review which Langfuse features require a license and configure redaction before export. This is an extension path; the two-day baseline depends on structured logs and durable run records.
+
+## Administrator operations and privacy
+
+The Admin Console shows member states, opaque user IDs, last activity, storage and model-call usage, connector health, queue state, safe error codes, backup age and maintenance outcomes. Per-user resource metrics are visible to administrators for operations; resumes, search questions, job content, match rationales and tracker notes are not. Do not put private content into diagnostic exports, tool traces or raw exception strings.
+
+Every invite, activation, suspension, role/quota/configuration change and maintenance action creates an append-only AdminAuditEvent with actor, tenant, action, target opaque ID, reason, safe before/after metadata, UTC timestamp and trace ID. Do not store raw invitation tokens. Keep audit metadata for 90 days by default, separate from 14-day sanitized operational logs. Unauthorized actions return safe denials and create security telemetry.
+
+Housekeeping uses allowlisted services for expired invitations, old logs/checkpoints, stale public cache, cancelled tasks and verified orphan uploads. Each job has preview counts, bounded batches, a lease, idempotency key and result. Bulk erasure or irreversible purge requires explicit confirmation of the target and impact; backup restore is a controlled operator procedure and is excluded from a one-click admin action. See document 22 for the runbook and permission matrix.

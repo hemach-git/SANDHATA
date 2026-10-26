@@ -1,0 +1,12 @@
+.git
+.env*
+.venv
+runtime
+backups
+deliverables
+docs
+tests
+scripts
+__pycache__
+.pytest_cache
+.streamlit/secrets.toml

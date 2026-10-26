@@ -1,6 +1,6 @@
 # Sandhātā Design and Accelerated Build Plan
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
@@ -43,3 +43,11 @@ Canonical jobs precede description indexing; resume parsing precedes evidence va
 ## Review cadence
 
 Review the first vertical slice immediately, then review after tracker and analytics integration. Maintain a live checklist of passed, failed and not-run cases. Record elapsed work, remaining scope and blocking dependency at each gate. No external outreach or application submission is part of these build activities.
+
+## Revised family critical path
+
+The original hourly table is an initial timebox, not a commitment that the expanded scope fits unchanged. Replace the first shell milestone with OIDC plus invite-only membership, PostgreSQL migrations and owner-scoped storage. The first vertical slice uses two independent member accounts. Implement the administrator account console and audit writes before shared deployment.
+
+Day 1 priorities are identity setup, PostgreSQL/RLS, separate member storage, manual import and the first comparison. Day 2 priorities are revocation, admin housekeeping and diagnostics, tracker/analytics isolation, and family release verification. Source breadth, board-style tracker polish and optional semantic search yield time to these P0 requirements. Production remains pending if identity configuration, concurrency, isolation or recovery gates fail. A realistic reforecast must follow the first authenticated two-account slice.
+
+G1 now requires two members to complete independent workflows. G2 includes owner-scoped connectors, caches, tasks and MCP identity. G3 includes admin authorization, last-admin protection and destructive-job confirmations. G4 requires authenticated family access, PostgreSQL recovery and deployment checks with at least five concurrent test sessions.

@@ -1,0 +1,13 @@
+{$SANDHATA_HOSTNAME} {
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy no-referrer
+        Strict-Transport-Security "max-age=31536000"
+    }
+    handle_path /private/* {
+        reverse_proxy api:18502
+    }
+    handle {
+        reverse_proxy web:18501
+    }
+}

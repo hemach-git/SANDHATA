@@ -1,0 +1,17 @@
+{
+  "scope": "Local synthetic browser walkthrough",
+  "checks": [
+    "Real OIDC administrator login",
+    "Job import with original source URL",
+    "DOCX upload and parsed preview",
+    "Authenticated original download completed",
+    "Selected-resume durable comparison completed with quoted evidence",
+    "Tracker Applied event persisted with selected resume",
+    "Analytics reconciled to one applied record and zero interview/offer events"
+  ],
+  "alignment": 58,
+  "coverage": 100,
+  "model_duration_ms": 54156,
+  "no_real_application_submitted": true,
+  "public_production": false
+}

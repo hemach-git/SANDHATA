@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-10-26T22:36:52.791584+00:00",
+  "status": "encrypted_backup_and_isolated_restore_verified",
+  "restored_tables": 15,
+  "originals": 1,
+  "original_fingerprints": "verified",
+  "identity_provider_backup": "separate_operator_requirement",
+  "tombstones": "included; reconcile with current tombstones before any real restore"
+}

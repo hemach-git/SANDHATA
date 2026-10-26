@@ -1,6 +1,6 @@
 # Sandhātā GitHub and Collaboration Guide
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
@@ -48,7 +48,7 @@ git commit -m "Implement core job comparison workflow"
 git push -u origin codex/core-workflow
 ```
 
-The example paths for implementation commits apply only once those directories exist. Review the staged content before every commit. Use a pull request for implementation changes and include behavior, validation and remaining limits. Avoid committing generated runtime logs, private resumes, SQLite files, environment files and document QA render images.
+The example paths for implementation commits apply only once those directories exist. Review the staged content before every commit. Use a pull request for implementation changes and include behavior, validation and remaining limits. Avoid committing generated runtime logs, private resumes, database dumps, environment files and document QA render images.
 
 ## Publication verification
 
@@ -57,3 +57,7 @@ After push, compare git rev-parse HEAD with git ls-remote origin refs/heads/main
 ## Release workflow
 
 Pin dependencies, run tests/evals, review the diff and create a version tag only after acceptance. Suggested first implementation tag is v0.1.0; the design package is not an implemented application release. Keep CI deterministic with synthetic data; a separate optional job handles live provider checks without exposing secrets in logs.
+
+## Family baseline publication
+
+Version 0.2 changes the target from personal-only to invite-only family use with administration. Publish the revised Markdown and Word documents, generator and manifest together. No family invitation token, OIDC secret, account export, database dump or real member evaluation fixture belongs in Git. The source repository remains https://github.com/hemach-git/sandhata and the local root remains C:/Users/Chepuri/Documents/ChatGPT/sandhata.

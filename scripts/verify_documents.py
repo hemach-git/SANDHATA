@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT=Path(__file__).resolve().parents[1]
-QA=ROOT/'deliverables'/'qa'
+QA=ROOT/'deliverables'/'qa'/'v0.2'
 QA.mkdir(parents=True,exist_ok=True)
 RENDER=Path('C:/Users/Chepuri/.codex/plugins/cache/openai-primary-runtime/documents/26.1025.11240/skills/documents/render_docx.py')
 env=os.environ.copy()

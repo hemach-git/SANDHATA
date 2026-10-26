@@ -1,0 +1,12 @@
+{
+  "transport": "local_stdio",
+  "initialization": "passed",
+  "tool_allowlist": [
+    "list_my_tracker",
+    "search_my_evidence",
+    "search_my_jobs"
+  ],
+  "authorized_read": "passed",
+  "unknown_tool": "rejected",
+  "private_content_logged": false
+}

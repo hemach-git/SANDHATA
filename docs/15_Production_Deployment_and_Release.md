@@ -1,20 +1,20 @@
 # Sandhātā Production Deployment and Release Guide
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
 ## Deployment target and claim boundary
 
-The baseline production target is a single private Linux host running one application instance and one worker against local persistent storage. Host provider, domain, identity provider and budget are not yet selected. This document is a deployment specification; it is not evidence of a deployed service. A private local pilot can precede hosted production.
+The baseline production target is a single private Linux host running one application instance and one worker, a private PostgreSQL service, and private file storage. Host provider, domain, identity provider and budget are not yet selected. This document is a deployment specification; it is not evidence of a deployed service. A private local pilot can precede hosted production.
 
 ![Private deployment architecture](assets/deployment.png)
 
 ## Runtime topology
 
-An authenticated TLS reverse proxy routes browser traffic and WebSocket upgrades to Streamlit. Use Caddy or an existing reverse proxy with oauth2-proxy or an equivalent established OIDC gate. Restrict access to the owner's identity. Bind the application to a private container network; expose only the proxy. Keep the worker and model endpoint private. Local stdio MCP is not exposed over the public network.
+Caddy or an existing TLS reverse proxy routes browser traffic and WebSocket upgrades to Streamlit. Streamlit performs the OIDC sign-in and the application performs membership and role authorization; a proxy login is not a substitute for these service checks. Restrict access to invited, active family identities; the app resolves membership and roles after OIDC sign-in. Bind the application to a private container network; expose only the proxy. Keep the worker and model endpoint private. Local stdio MCP is not exposed over the public network.
 
-Mount persistent data at /data for database, uploads and safe operational state. Use one SQLite database on local disk with WAL and foreign keys. Container restarts must retain the volume. Do not place the live database in the image, repository, ephemeral filesystem or a shared network filesystem. A move to multiple replicas requires PostgreSQL and a revised file-storage design.
+Mount persistent data at /data for database, uploads and safe operational state. Use PostgreSQL on a private network with persistent database storage, migrations and forced RLS. Keep uploads in private storage using tenant/user/opaque-ID keys. Container restarts must retain both stores. Database dumps and originals never enter the image or repository. Additional app replicas require a shared private object store, session strategy and a revised capacity test.
 
 ## Configuration contract
 
@@ -33,7 +33,7 @@ These are proposed settings to implement and validate. Keep runtime secrets out 
 
 ## Release procedure
 
-1. Select host, access mode and model; confirm owner identity restriction and storage path.
+1. Select host, access mode and model; confirm invited-family access, admin bootstrap and storage paths.
 2. Check out the verified release SHA; install the exact dependency lock or build the pinned image.
 3. Stop writes, create a consistent backup and apply migrations in a one-time release step.
 4. Start application and worker under non-root accounts with constrained file permissions.
@@ -44,7 +44,7 @@ These are proposed settings to implement and validate. Keep runtime secrets out 
 
 ## Backup and rollback
 
-Use SQLite's online backup mechanism or stop writers; do not copy only the live .db file while WAL writes are active. Capture uploads and database consistently, encrypt backup storage and retain seven daily copies initially. Proposed recovery objectives are at most 24 hours of data loss and two hours to restore; prove them with a timed drill. Reapply deletion tombstones on restore. Roll back the application image only when schema compatibility is known; otherwise restore the matching database/files backup and disclose the data-loss interval.
+Use a consistent PostgreSQL dump/base-backup strategy and a coordinated file manifest. Pause writes during the initial simple family backup procedure so database and file snapshots describe the same state. Include identity-provider configuration backups separately when self-hosted. Capture uploads and database consistently, encrypt backup storage and retain seven daily copies initially. Proposed recovery objectives are at most 24 hours of data loss and two hours to restore; prove them with a timed drill. Reapply deletion tombstones on restore. Roll back the application image only when schema compatibility is known; otherwise restore the matching database/files backup and disclose the data-loss interval.
 
 ## Health and security gate
 
@@ -53,3 +53,13 @@ Use Streamlit's documented health path for process readiness and a worker heartb
 ## Evidence and ongoing ownership
 
 Release evidence includes CI/test/eval summaries, owner walkthrough, restore log, authenticated UI check, immutable commit and known limitations. The owner operates credentials and backup access. A failed critical check leaves the release candidate unpromoted. No automatic infrastructure purchase or public exposure is required by this document.
+
+## Family deployment and migration gate
+
+Add OIDC issuer/client ID, redirect URI, cookie secret and client secret through validated secret configuration. Configure first-admin issuer/subject out of band; no shared family password or default administrator password is allowed. Set database application and migration credentials separately; the application role cannot bypass RLS. A self-hosted Keycloak deployment requires its own database/schema, backup plan, TLS configuration and upgrade ownership.
+
+Before family access, verify two members and an administrator, denied uninvited access, invitation redemption, session revocation, forbidden cross-user URLs, private downloads, cache scoping, member/admin navigation and five concurrent sessions. Test worker access after suspension and RLS with the actual runtime database role. The deployed health check must distinguish app, worker, database and identity-provider availability.
+
+The local pilot already uses PostgreSQL. If older private records are imported from a separate prototype, stop writes, back up, map every private row to an explicit member, import into PostgreSQL, validate ownership and counts, and retain a rollback snapshot. Never assign legacy private records to all members or infer ownership from filenames.
+
+Restore is offline/operator-controlled. Preserve deletion tombstones and suspension/auth-version changes so older backups cannot reactivate accounts or resurrect erased content. After restore, rerun account access checks before reopening traffic. Revoke stale application sessions and background task capabilities.

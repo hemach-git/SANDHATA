@@ -1,12 +1,12 @@
 # Sandhātā Analytics Requirements and Design
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
 ## Objective and data basis
 
-Show where the owner's effort goes, how applications progress and which evidence gaps recur. Analytics is descriptive decision support for a personal search. It does not establish that a source or resume causes better outcomes. Metrics are computed in SQL and deterministic Python, then explained by the Career Assistant.
+Show where the owner's effort goes, how applications progress and which evidence gaps recur. Analytics is descriptive decision support for each member's search. It does not establish that a source or resume causes better outcomes. Metrics are computed in SQL and deterministic Python, then explained by the Career Assistant.
 
 ## Metric definitions
 
@@ -44,3 +44,9 @@ Reusable query functions accept date range, source, resume, role and status filt
 ## Advanced roadmap
 
 Add cohort maturity comparisons, response-time survival analysis and richer salary breakdowns after sufficient records accumulate. Forecasting or probability-of-offer features require a separate statistical design and validation. The first release's impressive analytics comes from clear definitions, interactive filtering and trustworthy evidence rather than speculative prediction.
+
+## Member analytics and admin usage
+
+Career metrics remain owner-scoped in SQL/RLS. Members cannot compare relatives' resumes, salaries or outcomes. Account timezone defaults to America/New_York and accompanies exports.
+
+Administrators see account activity, storage, model usage, failure counts, cache age and backup health. Career leaderboards and shared outcome reports are excluded; a small-family aggregate is not reliably anonymous. Test identical member queries, connection-pool reuse, exports and cache keys for isolation. Operational totals must reconcile without revealing private titles or notes.

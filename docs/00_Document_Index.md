@@ -1,12 +1,12 @@
 # Sandhātā FDE Document Index
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
 ## Package purpose
 
-This package establishes the delivery baseline for Sandhātā Career Intelligence, a private agent-assisted job search and application workspace. It contains project governance, implementation contracts, diagrams, tests and AI evaluation plans, retrieval, integrations, interface design, analytics, operations and five individual agent guides. It supports the accelerated October 26 to 27 2026 target without representing planned capabilities as completed software.
+This package establishes the delivery baseline for Sandhātā Career Intelligence, an invite-only family agent-assisted job search and application workspace. It contains project governance, implementation contracts, diagrams, tests and AI evaluation plans, retrieval, integrations, interface design, analytics, operations, five individual agent guides, and a dedicated administrator and family access guide. It supports the accelerated October 26 to 27 2026 target without representing planned capabilities as completed software.
 
 ## Reading order
 
@@ -37,6 +37,8 @@ Read the charter and scope first, then architecture and sequence flows. Use the 
 | Sandhātā Fit Analyst Agent Guide | [Markdown](19_Fit_Analyst_Agent_Guide.md) | [Word](../deliverables/word/19_Fit_Analyst_Agent_Guide.docx) |
 | Sandhātā Career Assistant Agent Guide | [Markdown](20_Career_Assistant_Agent_Guide.md) | [Word](../deliverables/word/20_Career_Assistant_Agent_Guide.docx) |
 | Sandhātā Risks Decisions and Release Evidence | [Markdown](21_Risks_Decisions_and_Release_Evidence.md) | [Word](../deliverables/word/21_Risks_Decisions_and_Release_Evidence.docx) |
+| Sandhātā Administrator and Family Access Guide | [Markdown](22_Administrator_and_Family_Access_Guide.md) | [Word](../deliverables/word/22_Administrator_and_Family_Access_Guide.docx) |
+| Sandhātā Implementation and Operating Handoff | [Markdown](23_Implementation_and_Operating_Handoff.md) | [Word](../deliverables/word/23_Implementation_and_Operating_Handoff.docx) |
 
 ## Format and change discipline
 
@@ -44,4 +46,4 @@ Markdown is the editable source of record. The Word versions contain the same pr
 
 ## Implementation status
 
-The current deliverable is the FDE document baseline and repository preparation. Tests, evaluations, MCP tools, UI, production deployment and live integrations described here require implementation and evidence. Concept diagrams and mockups are labeled as designs. The GitHub guide contains owner-run publication commands for the separate repository.
+The package contains the FDE target specification and a working local pilot. Document 23 records the implemented subset, verification evidence and remaining acceptance gates. AI comparisons are experimental; public deployment is pending. Concept diagrams remain labeled as designs. The GitHub guide contains owner-run publication commands for the separate repository.

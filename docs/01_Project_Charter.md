@@ -1,12 +1,12 @@
 # Sandhātā Project Charter
 
-Version 0.1 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
+Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
 This document specifies the intended implementation. Application code, test results, live integrations, GitHub publication and production deployment are not established by this document. Dates are delivery targets in America/New_York, subject to the release gates.
 
 ## Purpose and decision
 
-Build a private career intelligence workspace that reduces repeated job research, makes resume alignment explainable, and records application progress. The owner is the initial user and acceptance reviewer. Premium job portals remain part of the user's search workflow; supported feeds and assisted imports bring their results into one workspace.
+Build a private career intelligence workspace that reduces repeated job research, makes resume alignment explainable, and records application progress. The owner is the initial administrator and acceptance reviewer; invited family members have independent private workspaces. Premium job portals remain part of the user's search workflow; supported feeds and assisted imports bring their results into one workspace.
 
 Sandhātā is the display name; sandhata is the technical identifier. SANDHĀTĀ expands to Search, Analyze, Navigate, Discover, Highlight, Apply, Track, Advance. This English brand expansion is separate from the Sanskrit inspiration. Domain and trademark availability have not been established.
 
@@ -32,12 +32,20 @@ The owner supplies example jobs, resumes, access choices and final acceptance. T
 
 ## Schedule and success boundary
 
-Target October 26: agreed baseline and functional local vertical slice. Target October 27: integrated personal-use release and private production candidate. Documentation preparation consumes this same time budget. Scope is reduced before evidence gates are waived; final release may move if access or critical defects remain unresolved.
+Target October 26: agreed baseline and functional local vertical slice. Target October 27: integrated family pilot release and private production candidate. Documentation preparation consumes this same time budget. Scope is reduced before evidence gates are waived; final release may move if access or critical defects remain unresolved.
 
 ## Constraints and assumptions
 
-One owner, one application instance and modest data volume. Text PDF and DOCX resumes are supported initially. Remotive automatic ingestion is available through its documented public API; LinkedIn, Ladders and Indeed use assisted import unless appropriate programmatic access is established. An available model and its data-handling mode are prerequisites for AI comparison.
+One family household, an initial test envelope of ten accounts and five concurrent sessions, one application instance and modest data volume. These numbers are capacity targets to test, not measured limits. Text PDF and DOCX resumes are supported initially. Remotive automatic ingestion is available through its documented public API; LinkedIn, Ladders and Indeed use assisted import unless appropriate programmatic access is established. An available model and its data-handling mode are prerequisites for AI comparison.
 
 ## Exit criteria
 
 All P0 acceptance cases pass; no open critical privacy or data-loss defect; matching evaluations satisfy the release rubric; backup restore is demonstrated; deployment evidence is captured if a hosted release is claimed. The owner can export data and explain what each score means. Code, docs and versioned evidence identify the same release commit.
+
+## Family access and administration
+
+Family access is a core release requirement. Invite-only members sign in independently and keep their search profiles, resumes, imported jobs, matches, trackers, notes and analytics private. Every family member uses their own premium job-portal accounts in their browser; credentials and paid access are never shared through the application.
+
+Administrators manage invitations, membership, role changes, account suspension, quotas, source configuration, system diagnostics and controlled housekeeping. Administrative access does not grant routine access to member resumes or career notes. Infrastructure operators can access backups and storage technically; operational access is restricted and documented rather than promising protection from a host owner.
+
+The two-day plan is now a best-case family pilot target. Identity configuration, PostgreSQL isolation and two-account security tests are mandatory dependencies. If those gates do not pass, only a local development preview may be demonstrated; a family-accessible release remains pending.

@@ -1,0 +1,13 @@
+{
+  "web": 200,
+  "private_api": 200,
+  "identity": 200,
+  "database_runtime_role": {
+    "rolsuper": false,
+    "rolbypassrls": false
+  },
+  "worker_heartbeat_present": true,
+  "image": "sha256:f79a31548e61d4db675ac5f4ff36e0e92474d20f0e77841b35d3401b2c398dee",
+  "container_startup": "Missing identity settings show guidance and disable sign-in; private pages stay closed",
+  "public_deployment": false
+}
