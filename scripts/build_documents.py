@@ -499,14 +499,14 @@ Contract tests prove schema validity, limit enforcement, missing-record handling
 add('11_GitHub_and_Collaboration_Guide', 'Sandhātā GitHub and Collaboration Guide', '''
 ## Repository destination
 
-The owner created https://github.com/hemach-git/sandhata and will run the network Git commands collaboratively. The local preparation directory is sandhata beneath the current BRIHASPATI workspace; it is an independent Git repository. Always verify the working directory and origin before staging or pushing. Never run git add from the finance repository for this work.
+The owner created https://github.com/hemach-git/sandhata and will run the network Git commands collaboratively. The local repository is C:/Users/Chepuri/Documents/ChatGPT/sandhata, a sibling of BRIHASPATI and an independent Git repository. Always verify the working directory and origin before staging or pushing. Never run git add from the finance repository for this work.
 
 ## Initial publication commands
 
 Open PowerShell and run these commands one at a time. The preparation step may already have created the local commit; git status will show whether there are changes. Authenticate through Git Credential Manager when prompted; do not paste tokens into chat.
 
 ```powershell
-Set-Location -LiteralPath 'C:\\Users\\Chepuri\\Documents\\ChatGPT\\BRIHASPATI - AI Finance Assistant\\sandhata'
+Set-Location -LiteralPath 'C:\\Users\\Chepuri\\Documents\\ChatGPT\\sandhata'
 git rev-parse --show-toplevel
 git status --short
 git remote -v
