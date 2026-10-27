@@ -295,6 +295,7 @@ def word(name,md):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--only',nargs='*',help='Rebuild Word only for matching document prefixes')
     args=parser.parse_args()
     diagrams()
     idx=['| Document | Markdown source | Word version |','| --- | --- | --- |']
@@ -308,7 +309,8 @@ def main():
         p=DOCS/(name+'.md')
         if p.exists() and not name.startswith('00'):
             md=p.read_text(encoding='utf-8')
-        p.write_text(md,encoding='utf-8'); word(name,md)
+        p.write_text(md,encoding='utf-8')
+        if not args.only or any(name.startswith(prefix) for prefix in args.only): word(name,md)
         manifest.append({'name':name,'markdown':str(p.relative_to(ROOT)).replace('\\','/'),'word':f'deliverables/word/{name}.docx','source_sha256':hashlib.sha256(md.encode()).hexdigest(),'words':len(md.split())})
     (ROOT/'deliverables'/'manifest.json').write_text(json.dumps({'version':'0.2','date':'2026-10-26','documents':manifest,'application_status':'local_pilot_experimental_ai','qa_status':'pending_render'},indent=2),encoding='utf-8')
     print(json.dumps({'documents':len(manifest),'words':sum(m['words'] for m in manifest),'word_directory':str(WORD)},ensure_ascii=True))

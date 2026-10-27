@@ -6,9 +6,9 @@
       "name": "00_Document_Index",
       "markdown": "docs/00_Document_Index.md",
       "word": "deliverables/word/00_Document_Index.docx",
-      "source_sha256": "cb1b927a942324bdbdc226c97dd15eb12b0f7c0af20ac02532a43d8bab7f7fe5",
-      "words": 566,
-      "word_sha256": "da77b6e9090af3bba429a4c62124e4a544dc11bc16974f709d74406d93b54483",
+      "source_sha256": "e53959392bcd6f21fa30030505efa68216b35f61131c43a582192c4bb0d83419",
+      "words": 576,
+      "word_sha256": "dfc9bbdad65179f62e1d35cc7200cd880888604e994f931ee5dae3b596ac1eaf",
       "rendered_pages": 2
     },
     {
@@ -141,9 +141,9 @@
       "name": "15_Production_Deployment_and_Release",
       "markdown": "docs/15_Production_Deployment_and_Release.md",
       "word": "deliverables/word/15_Production_Deployment_and_Release.docx",
-      "source_sha256": "b2ab18186246d75ab72f8df99e73f75c062cd9e1eb06a70ee10845cfca46c6a0",
-      "words": 970,
-      "word_sha256": "02c3866edc29d8ebed51904e144d5331c4ef6cd314e2091cb8c21fe6d52e08ce",
+      "source_sha256": "1ab312db0e5887db55744360f54baaa677008d21e6ff9ff06e22958d550d311a",
+      "words": 983,
+      "word_sha256": "b29dfc99851bdf05074baaf414013aabe30d86428ad4a0ca01e7b8148d776621",
       "rendered_pages": 3
     },
     {
@@ -213,13 +213,22 @@
       "name": "23_Implementation_and_Operating_Handoff",
       "markdown": "docs/23_Implementation_and_Operating_Handoff.md",
       "word": "deliverables/word/23_Implementation_and_Operating_Handoff.docx",
-      "source_sha256": "d75860a60a36364bea9141e6725dc59b35ccbc229b420f2a1c04b1181e7216dc",
-      "words": 1490,
-      "word_sha256": "02af5e1fa192d807bc3221b158c1a8e5134559f141a8c40ec4310c2541b5e75c",
+      "source_sha256": "9debd0e10adad1b987c73ac961ec1c5e2870b3faf382ab889e36896367dc557e",
+      "words": 1537,
+      "word_sha256": "a94373dc419299a7b74aecfbb9347bcb01231d3433946678809c092bba42f744",
       "rendered_pages": 4
+    },
+    {
+      "name": "24_AWS_Deployment_Guide",
+      "markdown": "docs/24_AWS_Deployment_Guide.md",
+      "word": "deliverables/word/24_AWS_Deployment_Guide.docx",
+      "source_sha256": "de920f8ea5f655aaf9307182ad344fc83b5d52c11ce8fe2f58fe1c818e2a6dca",
+      "words": 1378,
+      "word_sha256": "e93137119cb8fdff67a8f31b7f1470296ca44a953506c748b92177e01384f5e1",
+      "rendered_pages": 3
     }
   ],
   "application_status": "local_pilot_experimental_ai",
   "qa_status": "rendered_and_visually_reviewed",
-  "total_rendered_pages": 62
+  "total_rendered_pages": 65
 }

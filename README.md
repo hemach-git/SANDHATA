@@ -40,6 +40,8 @@ Remotive public API uses a deployment-wide six-hour cache. Greenhouse, Lever and
 
 ## Deployment and GitHub
 
+Current operation is local to this home computer, with individual family logins. Use a separate browser profile per person and sign out when switching users. AWS is a future deployment target; the CHAKRA AWS account/profile is excluded. See [the AWS deployment guide](docs/24_AWS_Deployment_Guide.md) and `deploy/aws/foundation.json` for the isolated infrastructure foundation. Read-only STS and CloudFormation template validation passed; no AWS infrastructure has been created. A future separate AWS setup, domain and budget will be supplied when deployment resumes.
+
 `Dockerfile`, `compose.production.yaml` and `deploy/Caddyfile` package the application tier. Production requires actual DNS/host access, a production OIDC provider, PostgreSQL roles, persistent storage and private secrets. Do not expose the local Keycloak development container. The operating handoff supplies the checklist.
 
 Repository: https://github.com/hemach-git/sandhata. The user runs publication commands from [the GitHub guide](docs/11_GitHub_and_Collaboration_Guide.md). Private files are ignored and excluded from container builds. Sandhātā is the display name; `sandhata` is the ASCII identifier. The branding acronym is original and is not a Sanskrit translation.

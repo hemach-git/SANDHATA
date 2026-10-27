@@ -53,7 +53,7 @@ env = {
     '[auth]\nredirect_uri = "http://localhost:18501/oauth2callback"\n'
     f'cookie_secret = "{secret()}"\n\n[auth.keycloak]\nclient_id = "sandhata-web"\n'
     f'client_secret = "{clientsecret}"\nserver_metadata_url = "{env["SANDHATA_OIDC_ISSUER"]}/.well-known/openid-configuration"\n'
-    'client_kwargs = {scope = "openid profile email", max_age = 28800}\n',encoding='utf-8')
+    'client_kwargs = {scope = "openid profile email", prompt = "login", max_age = 28800}\n',encoding='utf-8')
 guide=['# Private localhost access','',
        'This file contains generated credentials. Do not commit, share publicly, or paste into chat.',
        '', 'Application: http://localhost:18501', 'Identity console: http://localhost:18180/admin',

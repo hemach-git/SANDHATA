@@ -39,6 +39,7 @@ Read the charter and scope first, then architecture and sequence flows. Use the 
 | Sandhātā Risks Decisions and Release Evidence | [Markdown](21_Risks_Decisions_and_Release_Evidence.md) | [Word](../deliverables/word/21_Risks_Decisions_and_Release_Evidence.docx) |
 | Sandhātā Administrator and Family Access Guide | [Markdown](22_Administrator_and_Family_Access_Guide.md) | [Word](../deliverables/word/22_Administrator_and_Family_Access_Guide.docx) |
 | Sandhātā Implementation and Operating Handoff | [Markdown](23_Implementation_and_Operating_Handoff.md) | [Word](../deliverables/word/23_Implementation_and_Operating_Handoff.docx) |
+| Sandhātā AWS Deployment Guide | [Markdown](24_AWS_Deployment_Guide.md) | [Word](../deliverables/word/24_AWS_Deployment_Guide.docx) |
 
 ## Format and change discipline
 

@@ -1,0 +1,16 @@
+{
+  "recorded_at": "2026-10-27T00:02:33.654616+00:00",
+  "aws_identity_lookup": "passed",
+  "cloudformation_validate_template": "passed_on_preliminary_template",
+  "iam_capability": "CAPABILITY_IAM",
+  "local_template_checks": "passed",
+  "resource_count": 21,
+  "billable_resources_created": false,
+  "deployment_account_selected": false,
+  "public_deployment": false,
+  "limitation": "Syntax and local invariants only; deployment permissions, host bootstrap and application acceptance are not established",
+  "cfn_lint": "passed_on_final_template",
+  "deployment_status": "deferred_by_owner_home_computer_only",
+  "excluded_profile": "chakra",
+  "final_template_remote_validation": "deferred_until_future_separate_account"
+}

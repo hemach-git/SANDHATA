@@ -6,7 +6,7 @@ This document specifies the intended implementation. Application code, test resu
 
 ## Deployment target and claim boundary
 
-The baseline production target is a single private Linux host running one application instance and one worker, a private PostgreSQL service, and private file storage. Host provider, domain, identity provider and budget are not yet selected. This document is a deployment specification; it is not evidence of a deployed service. A private local pilot can precede hosted production.
+The baseline production target is a single private Linux host running one application instance and one worker, a private PostgreSQL service, and private file storage. AWS is the selected provider; account, domain, identity configuration and budget remain to be resolved. Document 24 provides the AWS foundation and deployment sequence. This document is a deployment specification; it is not evidence of a deployed service. A private local pilot can precede hosted production.
 
 ![Private deployment architecture](assets/deployment.png)
 

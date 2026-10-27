@@ -13,5 +13,6 @@
   "coverage": 100,
   "model_duration_ms": 54156,
   "no_real_application_submitted": true,
-  "public_production": false
+  "public_production": false,
+  "shared_computer_sign_in": "Verified empty credential form and prompt=login in the local OIDC flow"
 }
