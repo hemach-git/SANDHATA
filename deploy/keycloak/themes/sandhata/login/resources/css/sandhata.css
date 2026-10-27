@@ -7,3 +7,9 @@ body,body.kcBodyClass,.login-pf body{background:#FFFFFF!important;color:#123263!
 input{background:#FFFFFF!important;color:#123263!important;border:1px solid #CBD7E8!important;border-radius:6px!important}
 input:focus,button:focus-visible,a:focus-visible{outline:3px solid #F4C430!important;outline-offset:2px!important}
 a{color:#164B99!important}
+
+:root[data-theme="dark"] body,:root[data-theme="dark"] .card-pf,:root[data-theme="dark"] .pf-v5-c-login__main{background:#152238!important;color:#EEF3FC!important}
+:root[data-theme="dark"] #kc-page-title,:root[data-theme="dark"] h1,:root[data-theme="dark"] h2,:root[data-theme="dark"] label{color:#EEF3FC!important}
+:root[data-theme="dark"] input{background:#20334D!important;color:#EEF3FC!important;border-color:#D8B65A!important}
+:root[data-theme="dark"] a,:root[data-theme="dark"] #kc-header-wrapper{color:#9BC2FF!important}
+.card-pf,input{border-color:#D8B65A!important}body,label,input{font-weight:650!important}

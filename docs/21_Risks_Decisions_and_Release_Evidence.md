@@ -37,7 +37,7 @@ Select local or hosted model after hardware and privacy review. Select productio
 | Document preparation | Matched MD/DOCX and visual QA report | Generated and checked during authoring; consult manifest |
 | Source publication | Local SHA matches remote SHA | Pending owner Git commands |
 | Local application | Setup and end-to-end workflow evidence | Local synthetic import, resume and comparison walkthrough verified |
-| Tests | Commit-linked test report | 61 automated cases passed; see verification/application_tests.txt |
+| Tests | Commit-linked test report | 62 automated cases passed; see verification/application_tests.txt |
 | AI evals | Dataset, versions and threshold results | Three local synthetic smoke cases; full reviewed benchmark pending |
 | UI review | Screenshots and owner walkthrough | Local synthetic browser walkthrough; full accessibility audit pending |
 | Recovery | Timed restore and integrity report | Encrypted backup and isolated database restore verified |

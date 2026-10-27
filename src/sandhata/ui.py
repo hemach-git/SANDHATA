@@ -13,7 +13,7 @@ from . import repository as repo
 from . import identity as auth
 from . import connectors
 from .worker import enqueue
-from .presentation import configure_visuals,landing,workspace_brand,display_name
+from .presentation import configure_visuals,landing,workspace_brand,display_name,compact_chart
 
 def safe_csv(records):
     frame=pd.DataFrame(records)
@@ -29,10 +29,12 @@ def private_download(p,label,kind,identifier='',params=''):
         cache=dict(token=auth.issue_capability(p),created=time.time());st.session_state['download_capability']=cache
     url=os.getenv('SANDHATA_API_BASE_URL','http://localhost:18502')+'/download/'+kind+('/'+str(identifier) if identifier else '')+params
     # Bearer token is in a private authenticated component, never in a URL, HTML attribute, or access log.
-    script='''<button id="download" style="font:14px sans-serif;padding:9px 14px;border:2px solid #F4C430;border-radius:8px;background:white;color:#164B99;cursor:pointer">LABEL</button><span id="message" style="font:12px sans-serif;margin-left:8px"></span>
+    script='''<button id="download" style="font:700 13px sans-serif;padding:7px 12px;border:2px solid #D8B65A;border-radius:8px;background:white;color:#164B99;cursor:pointer">LABEL</button><span id="message" style="font:12px sans-serif;margin-left:8px"></span>
     <style>button:hover{background:#F4C430!important;color:#123263!important}button:focus-visible{outline:3px solid #164B99;outline-offset:2px}</style><script>document.getElementById('download').onclick=async()=>{const m=document.getElementById('message');m.textContent='Authorizing…';try{const r=await fetch(URL,{headers:{Authorization:'Bearer '+TOKEN}});if(!r.ok)throw new Error('Access expired or file unavailable. Refresh this page.');const blob=await r.blob();const a=document.createElement('a');const u=URL_OBJECT.createObjectURL(blob);a.href=u;a.download=(r.headers.get('content-disposition')||'').split('filename="')[1]?.split('"')[0]||'SANDHATA-download';a.click();setTimeout(()=>URL_OBJECT.revokeObjectURL(u),1000);m.textContent='Downloaded';}catch(e){m.textContent=e.message;}};</script>'''
     script=script.replace('LABEL',html.escape(label)).replace('URL_OBJECT','window.URL').replace('URL,',json.dumps(url)+',').replace('TOKEN',json.dumps(cache['token']))
-    components.html(script,height=55)
+    if st.session_state.get('sn_dark'):
+        script='<style>body{background:#152238;color:#EEF3FC}#download{background:#152238!important;color:#9BC2FF!important}#download:hover{background:#F8E8B4!important;color:#123263!important}</style>'+script
+    components.html(script,height=48)
 
 def result_view(result):
     st.caption('Experimental AI comparison · Review the quoted evidence before using this result.')
@@ -177,20 +179,20 @@ def insights(p):
     if n<10: st.info('Small sample: fewer than ten applications in this cohort.')
     a,b=st.columns(2)
     if metrics['current']:
-        a.plotly_chart(px.pie(pd.DataFrame(metrics['current']),names='status',values='n',hole=.65,title='Current pipeline · all saved applications'),use_container_width=True)
+        a.plotly_chart(compact_chart(px.pie(pd.DataFrame(metrics['current']),names='status',values='n',hole=.65,title='Current pipeline · all saved applications')),use_container_width=True,theme=None)
     if metrics['weekly']:
-        b.plotly_chart(px.line(pd.DataFrame(metrics['weekly']),x='week',y='applications',markers=True,title='Weekly applications'),use_container_width=True)
+        b.plotly_chart(compact_chart(px.line(pd.DataFrame(metrics['weekly']).assign(week=lambda d:pd.to_datetime(d['week']).dt.strftime('%b %d, %Y')),x='week',y='applications',markers=True,title='Weekly applications')),use_container_width=True,theme=None)
     if n:
-        st.plotly_chart(px.funnel(pd.DataFrame({'Stage':['Applied','Interview','Offer'],'Applications':[n,interview,offer]}),x='Applications',y='Stage',title='Observed cohort progression'),use_container_width=True)
+        st.plotly_chart(compact_chart(px.funnel(pd.DataFrame({'Stage':['Applied','Interview','Offer'],'Applications':[n,interview,offer]}),x='Applications',y='Stage',title='Observed cohort progression'),rows=3),use_container_width=True,theme=None)
         frame=pd.DataFrame(cohort)
         st.subheader('Source and resume outcomes')
-        st.dataframe(frame.groupby('source').agg(applications=('id','count'),interviews=('interview','sum'),offers=('offer','sum')).reset_index(),hide_index=True)
+        st.table(frame.groupby('source').agg(applications=('id','count'),interviews=('interview','sum'),offers=('offer','sum')).reset_index())
         frame['resume_label']=frame['resume_label'].fillna('Not recorded')
-        st.dataframe(frame.groupby('resume_label').agg(applications=('id','count'),interviews=('interview','sum'),offers=('offer','sum')).reset_index(),hide_index=True)
+        st.table(frame.groupby('resume_label').agg(applications=('id','count'),interviews=('interview','sum'),offers=('offer','sum')).reset_index())
         private_download(p,'Export applied cohort','cohort',params=f'?start={start.isoformat()}&end={end.isoformat()}')
     if metrics['gaps']:
         gaps=pd.DataFrame(metrics['gaps'],columns=['Requirement not evidenced','Count'])
-        st.plotly_chart(px.bar(gaps,x='Count',y='Requirement not evidenced',orientation='h',title='Frequently not evidenced requirements'),use_container_width=True)
+        st.plotly_chart(compact_chart(px.bar(gaps,x='Count',y='Requirement not evidenced',orientation='h',title='Frequently not evidenced requirements'),rows=len(gaps)),use_container_width=True,theme=None)
     if not n and not metrics['current']: st.info('Your charts will populate from saved jobs and recorded application events.')
 
 def diagnostics(p):

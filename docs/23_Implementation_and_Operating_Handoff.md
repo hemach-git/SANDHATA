@@ -33,7 +33,7 @@ Save an opportunity to Tracker, then explicitly record Applied and subsequent ev
 
 ## Verification evidence
 
-The reproducible automated command is .venv/Scripts/python.exe scripts/run_tests.py. It creates and removes only a randomly named sandhata_test_ database and never uses the active user database as a test target. The current recorded run has 61 passing cases. Raw results are in deliverables/verification/application_tests.txt.
+The reproducible automated command is .venv/Scripts/python.exe scripts/run_tests.py. It creates and removes only a randomly named sandhata_test_ database and never uses the active user database as a test target. The current recorded run has 62 passing cases. Raw results are in deliverables/verification/application_tests.txt.
 
 Three synthetic live model cases used local gpt-oss:20b: direct evidence passed, a missing-skill case passed, and an injection case was safely withheld after validation. See deliverables/verification/live_model_evals.json for actual results, traces and latency. This is a smoke evaluation, not the planned reviewed 48-pair dataset, held-out benchmark or proof of semantic accuracy. Broad usefulness gates remain unpassed. An earlier unsupported literal quote was rejected and prompted the bounded repair fix.
 

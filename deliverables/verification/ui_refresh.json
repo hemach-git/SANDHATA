@@ -9,20 +9,21 @@
     "highlight": "#F4C430"
   },
   "browser_verified": [
-    "landing",
-    "OIDC theme",
-    "administrator sign-in",
-    "Discover",
-    "Resume Library",
-    "Tracker",
-    "Insights",
-    "Admin Console"
+    "light landing with title rules and cards",
+    "landing dark mode",
+    "dark workspace forms",
+    "dark analytics and compact bars",
+    "light-mode switch and persistence after reload",
+    "light preference carried through sign-out to identity provider"
   ],
-  "automated_tests": 61,
+  "automated_tests": 62,
   "document_pairs": 25,
-  "rendered_pages_reviewed": 65,
+  "rendered_pages_reviewed": 66,
   "original_evidence": "preserved verbatim",
   "responsive_layout": "CSS breakpoints and AppTest verified; mobile device review remains outside this desktop check",
   "landing_authentication": "Actual provider-owned form in shared landing; automatic local OIDC entry; successful submit returned to workspace; account-switch control verified",
-  "landing_cards": "Bold text and bright sandalwood #F4C430 fill"
+  "landing_cards": "Light sandalwood #F8E8B4; bold text; 5px title rules",
+  "appearance": "Light and dark modes; local appearance cookie persists across reload and local identity provider",
+  "border": "#D8B65A",
+  "analytics": "245px standard charts; compact horizontal bars and funnels; explicit theme for PNG export; bold compact summary tables"
 }

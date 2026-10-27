@@ -123,10 +123,10 @@
       "name": "13_UI_Design_and_User_Guide",
       "markdown": "docs/13_UI_Design_and_User_Guide.md",
       "word": "deliverables/word/13_UI_Design_and_User_Guide.docx",
-      "source_sha256": "d3f30b983e967b34793b4c1f4a0d53b9acf348fed495fb7fce45793bdbde1df4",
-      "words": 1096,
-      "word_sha256": "e42db4f67ea9695faebba9e598e0e910db147ce1d8fb996bec08a44499be7b48",
-      "rendered_pages": 3
+      "source_sha256": "c1d9259cf36144be4584b798c675fc8d8d0a25ff9542d48c3c43409333b1258c",
+      "words": 1256,
+      "word_sha256": "615f7cae8d50927ead183bf67436b98bf7dcd339e8e8d53fe7f07a68e7583f98",
+      "rendered_pages": 4
     },
     {
       "name": "14_Analytics_Requirements_and_Design",
@@ -195,9 +195,9 @@
       "name": "21_Risks_Decisions_and_Release_Evidence",
       "markdown": "docs/21_Risks_Decisions_and_Release_Evidence.md",
       "word": "deliverables/word/21_Risks_Decisions_and_Release_Evidence.docx",
-      "source_sha256": "8e43363469644b82e8f180fbd43241418a6fb5166a174a6872c3e541cfa3aa89",
+      "source_sha256": "76c0bb5cb6c86743b74c93ff43f1fd8b64b702063f36b6c8c720c89544273324",
       "words": 898,
-      "word_sha256": "bd5ef3abc304dd62546a2c478efe0c1ede69881f640d5e2dd1ac81127a1766f1",
+      "word_sha256": "6e9184aa82a33b39e669b41c8234056624cb565d11a691add2a7f977eb4a1f4b",
       "rendered_pages": 3
     },
     {
@@ -213,9 +213,9 @@
       "name": "23_Implementation_and_Operating_Handoff",
       "markdown": "docs/23_Implementation_and_Operating_Handoff.md",
       "word": "deliverables/word/23_Implementation_and_Operating_Handoff.docx",
-      "source_sha256": "116dffe5ccb898f970d54609036716e92ef8a55a33e8e06f34b0e4aa32b0f61b",
+      "source_sha256": "6731f1ee39cd94da230fa698d563f927e13c1f17299077b8d8cbf7b77346e4a9",
       "words": 1550,
-      "word_sha256": "a1bb09e5abf266d449704deeca7677c24945a390ebb56143da6bfc85f7d69534",
+      "word_sha256": "96f75a3aa8f2359e45cbb6ac0c9a5dabd3d8bb93c3602972e7b1f098b184e673",
       "rendered_pages": 4
     },
     {
@@ -230,5 +230,5 @@
   ],
   "application_status": "local_pilot_experimental_ai",
   "qa_status": "rendered_and_visually_reviewed",
-  "total_rendered_pages": 65
+  "total_rendered_pages": 66
 }

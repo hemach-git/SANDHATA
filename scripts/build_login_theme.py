@@ -13,7 +13,8 @@ shell='''<#macro registrationLayout displayMessage=true displayInfo=false>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SANDHĀTĀ · Career Intelligence</title>
 <link rel="stylesheet" href="${url.resourcesPath}/css/landing.css">
-</head><body class="sn-idp-page"><main class="sn-idp-landing st-key-sn_landing">
+<script src="${url.resourcesPath}/js/theme.js" defer></script>
+</head><body class="sn-idp-page"><div class="sn-mode-bar"><button type="button" id="sn-mode" aria-pressed="false">Dark mode</button></div><main class="sn-idp-landing st-key-sn_landing">
 <div class="sn-idp-top"><div>__HERO__</div><section class="sn-idp-account" aria-label="Sign in">
 <div class="sn-account-eyebrow">YOUR NEXT CHAPTER</div><h2>Sign in</h2>
 <p class="sn-idp-welcome">Your opportunities. Your progress. One workspace.</p>
@@ -53,5 +54,9 @@ extra='''
 @media(max-width:850px){.sn-idp-top{grid-template-columns:1fr;gap:28px}.sn-idp-account{margin:0}.sn-idp-landing .sn-capabilities{margin-top:32px}}
 @media(max-width:520px){.sn-idp-landing{padding:24px 18px}.sn-idp-account{padding:20px}.sn-idp-landing .sn-capability{min-height:0}}
 '''
+extra=extra.replace('background:#FFFFFF','background:var(--sn-white)').replace('background:white','background:var(--sn-white)').replace('color:#123263','color:var(--sn-ink)').replace('color:#506581','color:var(--sn-muted)').replace('color:#164B99','color:var(--sn-blue)').replace('solid #B6C7DF','solid var(--sn-border)').replace('solid #F4C430','solid var(--sn-border)')
+extra+='\n.sn-idp-account .sn-idp-message,.sn-idp-account #input-error{background:var(--sn-gold-tint);color:var(--sn-ink)}.sn-mode-bar button:hover{background:var(--sn-sandal);color:#123263!important}.sn-mode-bar{max-width:1440px;margin:0 auto;padding:12px 48px 0;text-align:right}.sn-mode-bar button{background:var(--sn-white);color:var(--sn-ink);border:2px solid var(--sn-border);border-radius:7px;padding:7px 12px;font-weight:700;cursor:pointer}.sn-mode-bar button:focus-visible{outline:3px solid var(--sn-sandal)}.sn-idp-landing{padding-top:14px}.sn-idp-page label,.sn-idp-page input,.sn-idp-page p{font-weight:650}.sn-idp-account #kc-login{color:white}.sn-idp-account #kc-login:hover{color:#123263}\n'
 (TARGET/'resources/css/landing.css').write_text(CSS.read_text(encoding='utf-8')+extra,encoding='utf-8')
+jsdir=TARGET/'resources/js';jsdir.mkdir(exist_ok=True)
+(jsdir/'theme.js').write_text("""(()=>{const root=document.documentElement;const button=document.getElementById('sn-mode');const saved=document.cookie.split('; ').find(v=>v.startsWith('SANDHATA_THEME='));let dark=saved?.split('=')[1]==='dark';function apply(){root.dataset.theme=dark?'dark':'light';if(button){button.setAttribute('aria-pressed',String(dark));button.textContent=dark?'Light mode':'Dark mode';}document.cookie='SANDHATA_THEME='+(dark?'dark':'light')+'; Path=/; Max-Age=31536000; SameSite=Lax';}apply();button?.addEventListener('click',()=>{dark=!dark;apply();});})();""",encoding='utf-8')
 print('Built SANDHATA landing shell; Keycloak owns the real login form and authentication flow.')

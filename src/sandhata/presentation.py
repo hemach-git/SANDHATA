@@ -5,6 +5,7 @@ import re
 import plotly.graph_objects as go
 import plotly.io as pio
 import streamlit as st
+import streamlit.components.v1 as components
 
 BRAND='SANDHĀTĀ'
 BLUE='#164B99'
@@ -54,16 +55,44 @@ def capabilities_markup():
     cards=''.join('<article class="sn-capability">'+icon(kind)+'<div><h3>'+title+'</h3><p>'+summary+'</p><p class="sn-example">'+example+'</p></div></article>' for kind,title,summary,example in CAPABILITIES)
     return '<section class="sn-capabilities" aria-label="Workspace capabilities"><h2>One workspace. Every next step.</h2><p class="sn-section-summary">From the first search to your next opportunity.</p><div class="sn-card-grid">'+cards+'</div></section><footer class="sn-footer"><span>Evidence-led career decisions. Your next move stays yours.</span><span>SANDHĀTĀ · Career Intelligence</span></footer>'
 
+def chart_height(rows, minimum=170, maximum=350):
+    return min(maximum,max(minimum,78+28*rows))
+
+def compact_chart(figure, rows=None):
+    palette=pio.templates['SANDHATA'].layout
+    figure.update_layout(paper_bgcolor=palette.paper_bgcolor,plot_bgcolor=palette.plot_bgcolor)
+    figure.update_layout(height=chart_height(rows) if rows is not None else 245,
+        margin=dict(l=12,r=18,t=42,b=44),bargap=.38,
+        title=dict(font=dict(size=15)),font=dict(size=12,weight=650,color=palette.font.color),
+        legend=dict(orientation='h',y=-.12),autosize=True)
+    figure.update_xaxes(automargin=True,title_standoff=6)
+    figure.update_yaxes(title_standoff=6)
+    if rows is not None:
+        figure.update_yaxes(automargin=True,tickfont=dict(size=12))
+        figure.update_xaxes(dtick=1,tickformat='d')
+        figure.update_traces(cliponaxis=False)
+    return figure
+
 def configure_visuals():
-    st.markdown('<style>'+(ASSETS/'theme.css').read_text(encoding='utf-8')+'</style>',unsafe_allow_html=True)
+    if 'sn_dark' not in st.session_state:
+        st.session_state.sn_dark=st.context.cookies.get('SANDHATA_THEME','light')=='dark'
+    st.sidebar.toggle('Dark mode',key='sn_dark',help='Remember this appearance on this browser.')
+    dark=st.session_state.sn_dark
+    mode='dark' if dark else 'light'
+    components.html('<script>document.cookie="SANDHATA_THEME='+mode+'; Path=/; Max-Age=31536000; SameSite=Lax";</script>',height=0)
+    st.html('<span class="sn-theme-'+mode+'"></span><style>'+(ASSETS/'theme.css').read_text(encoding='utf-8')+'</style>')
+    surface='#152238' if dark else WHITE
+    text='#EEF3FC' if dark else INK
+    blue='#9BC2FF' if dark else BLUE
+    grid='#34465E' if dark else '#E8EEF7'
     pio.templates['SANDHATA']=go.layout.Template(layout=dict(
-        colorway=[BLUE,TURMERIC,'#437BC1','#9DBBE0','#8B6914','#DCE8F7'],
-        paper_bgcolor=WHITE,plot_bgcolor=WHITE,font=dict(family='Arial, sans-serif',color=INK),
-        title=dict(font=dict(color=INK,size=19)),
-        xaxis=dict(gridcolor='#E8EEF7',zerolinecolor='#D5E0EF'),
-        yaxis=dict(gridcolor='#E8EEF7',zerolinecolor='#D5E0EF'),
-        hoverlabel=dict(bgcolor=WHITE,bordercolor=TURMERIC,font_color=INK),
-        modebar=dict(bgcolor=WHITE,color=BLUE,activecolor='#8B6914')))
+        colorway=['#77A9F3' if dark else BLUE,TURMERIC,'#437BC1','#9DBBE0','#8B6914','#DCE8F7'],
+        paper_bgcolor=surface,plot_bgcolor=surface,font=dict(family='Arial, sans-serif',color=text),
+        title=dict(font=dict(color=text,size=15)),
+        xaxis=dict(gridcolor=grid,zerolinecolor=grid),
+        yaxis=dict(gridcolor=grid,zerolinecolor=grid),
+        hoverlabel=dict(bgcolor=surface,bordercolor='#D8B65A',font_color=text),
+        modebar=dict(bgcolor=surface,color=blue,activecolor=TURMERIC)))
     pio.templates.default='SANDHATA'
 
 def landing(auth_ready):
