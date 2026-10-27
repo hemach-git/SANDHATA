@@ -53,13 +53,13 @@ report={'document_pairs':len(manifest['documents']),'rendered_pages':manifest['t
         'scope':'Document quality; application verification is separately recorded in deliverables/verification',
         'application_status':'local_pilot_experimental_ai','github_status':'local_preparation_owner_push_pending'}
 (ROOT/'deliverables/quality_report.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
-archive=ROOT/'deliverables/Sandhata_FDE_Document_Package_v0.2.zip'
+archive=ROOT/'deliverables/SANDHATA_FDE_Document_Package_v0.2.zip'
 files=[ROOT/'README.md',ROOT/'.gitignore',manifest_path,ROOT/'deliverables/quality_report.json']
 for folder in ['docs','deliverables/word','scripts']:
     files.extend(p for p in (ROOT/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts)
 with ZipFile(archive,'w',ZIP_DEFLATED) as z:
     for p in sorted(set(files)):
-        z.write(p,'sandhata/'+p.relative_to(ROOT).as_posix())
+        z.write(p,'SANDHATA/'+p.relative_to(ROOT).as_posix())
 with ZipFile(archive) as z:
     assert z.testzip() is None
     assert not any('/.git/' in p or '/qa/' in p or p.endswith(('.db','.env')) for p in z.namelist())

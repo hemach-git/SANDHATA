@@ -58,23 +58,23 @@ def wrap(draw, text, maxw, ft):
         out.append(line)
     return out
 
-def label(draw, xy, text, ft, fill='#172B4D', width=300, center=False):
+def label(draw, xy, text, ft, fill='#123263', width=300, center=False):
     lines=wrap(draw,text,width,ft); y=xy[1]
     for line in lines:
         x=xy[0] - draw.textlength(line,font=ft)/2 if center else xy[0]
         draw.text((x,y),line,font=ft,fill=fill); y+=ft.size+7
 
-def box(d, rect, title, body='', fill='#EDF4F6'):
-    d.rounded_rectangle(rect, radius=14, fill=fill, outline='#9BB5BF',width=2)
+def box(d, rect, title, body='', fill='#FFFFFF'):
+    d.rounded_rectangle(rect, radius=14, fill=fill, outline='#F4C430',width=2)
     label(d,(rect[0]+18,rect[1]+16),title,font(24,True),width=rect[2]-rect[0]-36)
     if body: label(d,(rect[0]+18,rect[1]+57),body,font(20),width=rect[2]-rect[0]-36)
 
 def arrow(d,a,b,caption=''):
     import math
-    d.line([a,b],fill='#087F8C',width=4)
+    d.line([a,b],fill='#164B99',width=4)
     angle=math.atan2(b[1]-a[1],b[0]-a[0]); length=13
     pts=[b,(b[0]-length*math.cos(angle-.45),b[1]-length*math.sin(angle-.45)),(b[0]-length*math.cos(angle+.45),b[1]-length*math.sin(angle+.45))]
-    d.polygon(pts,fill='#087F8C')
+    d.polygon(pts,fill='#164B99')
     if caption: label(d,((a[0]+b[0])/2+8,(a[1]+b[1])/2-28),caption,font(17),width=220)
 
 def canvas(title,w=1400,h=900):
@@ -83,9 +83,9 @@ def canvas(title,w=1400,h=900):
     return im,d
 
 def diagrams():
-    im,d=canvas('Sandhātā application architecture',1400,850)
-    box(d,(35,105,330,255),'Family browsers','Search, resume, tracker, insights')
-    box(d,(420,105,1000,255),'Authenticated Streamlit UI','OIDC sign-in, membership gate and private views')
+    im,d=canvas('SANDHĀTĀ application architecture',1400,850)
+    box(d,(35,105,330,255),'User browsers','Search, resume, tracker, insights')
+    box(d,(420,105,1000,255),'Authenticated Streamlit UI','OIDC sign-in, membership gate and protected views')
     arrow(d,(330,180),(420,180))
     box(d,(420,335,1000,480),'Domain services and coordinator','Principal checks, deterministic writes and scoring')
     arrow(d,(710,255),(710,335))
@@ -95,18 +95,18 @@ def diagrams():
     arrow(d,(1000,365),(1070,265))
     box(d,(1070,365,1370,530),'Model adapter','Local or owner-selected hosted endpoint')
     arrow(d,(1000,420),(1070,420))
-    box(d,(420,600,1000,775),'Private data and evidence','PostgreSQL RLS and search, private uploads, history and run records')
+    box(d,(420,600,1000,775),'Protected data and evidence','PostgreSQL RLS and search, protected uploads, history and run records')
     arrow(d,(710,480),(710,600))
     box(d,(35,610,330,775),'Local MCP client','Principal-bound stdio tools through shared services')
-    d.line([(330,690),(370,690),(370,450)],fill='#087F8C',width=4)
+    d.line([(330,690),(370,690),(370,450)],fill='#164B99',width=4)
     arrow(d,(370,450),(420,450))
     im.save(ASSETS/'architecture.png')
 
-    im,d=canvas('Family identity and private data relationships',1400,800)
-    nodes=[((40,100,390,240),'User','Stable OIDC issuer and subject'),((520,100,870,240),'Membership','Tenant, role, state and auth_version'),((1010,100,1360,240),'Tenant','Invited family household'),((40,355,390,500),'Private Job','tenant_id and owner_user_id'),((520,355,870,500),'ResumeVersion','User-scoped original and evidence'),((1010,355,1360,500),'MatchAssessment','Owned job and resume versions'),((40,610,390,755),'Application','Owned job and submitted resume'),((520,610,870,755),'StatusEvent','Same-owner application history'),((1010,610,1360,755),'AdminAuditEvent','Safe metadata; append-only writes')]
+    im,d=canvas('User identity and protected data relationships',1400,800)
+    nodes=[((40,100,390,240),'User','Stable OIDC issuer and subject'),((520,100,870,240),'Membership','Tenant, role, state and auth_version'),((1010,100,1360,240),'Tenant','Invited user household'),((40,355,390,500),'Protected Job','tenant_id and owner_user_id'),((520,355,870,500),'ResumeVersion','User-scoped original and evidence'),((1010,355,1360,500),'MatchAssessment','Owned job and resume versions'),((40,610,390,755),'Application','Owned job and submitted resume'),((520,610,870,755),'StatusEvent','Same-owner application history'),((1010,610,1360,755),'AdminAuditEvent','Safe metadata; append-only writes')]
     for rect,t,b in nodes: box(d,rect,t,b)
     for aa,bb in [((390,170),(520,170)),((870,170),(1010,170)),((695,240),(695,355)),((870,425),(1010,425)),((215,500),(215,610)),((390,680),(520,680)),((1185,240),(1185,355))]: arrow(d,aa,bb)
-    d.line([(520,215),(455,215),(455,310),(215,310)],fill='#087F8C',width=4)
+    d.line([(520,215),(455,215),(455,310),(215,310)],fill='#164B99',width=4)
     arrow(d,(215,310),(215,355))
     im.save(ASSETS/'data_model.png')
 
@@ -119,7 +119,7 @@ def diagrams():
         xs=[170,520,870,1220]
         for x,a in zip(xs,actors):
             box(d,(x-145,90,x+145,165),a)
-            d.line((x,165,x,im.height-25),fill='#9BB5BF',width=2)
+            d.line((x,165,x,im.height-25),fill='#F4C430',width=2)
         for i,(a,b,msg) in enumerate(messages):
             y=215+i*88
             d.rectangle((min(xs[a],xs[b])+5,y-31,max(xs[a],xs[b])-5,y-2),fill='white')
@@ -127,28 +127,28 @@ def diagrams():
             arrow(d,(xs[a],y+20),(xs[b],y+20))
         im.save(ASSETS/(name+'.png'))
 
-    im,d=canvas('Private single host deployment',1400,820)
-    box(d,(40,120,390,270),'Family browsers','Invited member HTTPS session')
+    im,d=canvas('Protected single host deployment',1400,820)
+    box(d,(40,120,390,270),'User browsers','Invited member HTTPS session')
     box(d,(520,120,970,270),'TLS and identity gate','TLS proxy and OIDC identity; app membership checks')
     arrow(d,(390,195),(520,195))
-    d.rounded_rectangle((430,340,1370,780),radius=20,outline='#9BB5BF',width=3)
-    label(d,(455,355),'Private host and container network',font(25,True),width=850)
+    d.rounded_rectangle((430,340,1370,780),radius=20,outline='#F4C430',width=3)
+    label(d,(455,355),'Protected host and container network',font(25,True),width=850)
     box(d,(475,420,850,565),'Application','One Streamlit instance')
-    box(d,(930,420,1325,565),'Worker and model adapter','One worker; private model access')
-    d.line([(745,270),(745,310),(410,310),(410,490)],fill='#087F8C',width=4)
+    box(d,(930,420,1325,565),'Worker and model adapter','One worker; protected model access')
+    d.line([(745,270),(745,310),(410,310),(410,490)],fill='#164B99',width=4)
     arrow(d,(410,490),(475,490))
-    box(d,(475,635,1325,745),'Persistent local volume','Private PostgreSQL, user-scoped files and coordinated backups')
+    box(d,(475,635,1325,745),'Persistent local volume','Protected PostgreSQL, user-scoped files and coordinated backups')
     arrow(d,(665,565),(665,635)); arrow(d,(1130,565),(1130,635))
     im.save(ASSETS/'deployment.png')
 
-    im,d=canvas('Sandhātā Discover screen concept',1500,1000)
-    d.rectangle((0,75,270,1000),fill='#10243A')
-    label(d,(24,105),'Sandhātā',font(30,True),fill='white',width=225)
-    label(d,(24,152),'Career Intelligence',font(18),fill='#B9D9E2',width=225)
+    im,d=canvas('SANDHĀTĀ Discover screen concept',1500,1000)
+    d.rectangle((0,75,270,1000),fill='#FFFFFF',outline='#F4C430',width=3)
+    label(d,(24,105),'SANDHĀTĀ',font(30,True),fill='#164B99',width=225)
+    label(d,(24,152),'Career Intelligence',font(18),fill='#123263',width=225)
     for i,t in enumerate(['Discover','Resume Library','Tracker','Insights','Diagnostics']):
         y=245+i*80
-        if i==0: d.rounded_rectangle((15,y-10,255,y+45),radius=8,fill='#087F8C')
-        label(d,(30,y),t,font(22),fill='white',width=220)
+        if i==0: d.rounded_rectangle((15,y-10,255,y+45),radius=8,fill='#FFF8DD',outline='#F4C430')
+        label(d,(30,y),t,font(22),fill='#164B99',width=220)
     label(d,(310,110),'Discover your next opportunity',font(31,True),width=1100)
     box(d,(310,180,1450,265),'Search saved jobs','Role, company, skills or notes')
     box(d,(310,300,1450,400),'Source status','Remotive automatic | Premium portals assisted | Last refresh visible')
@@ -157,15 +157,15 @@ def diagrams():
         y=490+i*220
         box(d,(310,y,1450,y+190),t,c)
         label(d,(330,y+100),s,font(21),width=1000)
-        label(d,(330,y+145),'View details     Original posting     Compare resume     Save',font(20,True),fill='#087F8C',width=1050)
+        label(d,(330,y+145),'View details     Original posting     Compare resume     Save',font(20,True),fill='#164B99',width=1050)
     label(d,(310,955),'Design concept with synthetic jobs  |  No live results or measured scores shown',font(17),width=1100)
     im.save(ASSETS/'ui_discover.png')
 
-    im,d=canvas('Family access and administrator boundaries',1400,840)
+    im,d=canvas('User access and administrator boundaries',1400,840)
     box(d,(35,115,360,260),'Invited member','Independent OIDC identity')
     box(d,(520,115,900,260),'Authentication and Principal','Active membership, role and auth_version')
     arrow(d,(360,185),(520,185))
-    box(d,(1030,115,1370,285),'Private workspace','Own resumes, jobs, matches and tracker')
+    box(d,(1030,115,1370,285),'Protected workspace','Own resumes, jobs, matches and tracker')
     arrow(d,(900,185),(1030,185))
     box(d,(35,415,360,565),'Administrator','Active admin role rechecked server-side')
     box(d,(520,415,900,565),'Admin services','Users, quotas and bounded housekeeping')
@@ -173,8 +173,8 @@ def diagrams():
     box(d,(1030,415,1370,590),'Safe operations data','Redacted health, usage and append-only audit')
     arrow(d,(900,490),(1030,490))
     arrow(d,(710,260),(710,415),'Authorize admin action')
-    box(d,(300,685,1120,800),'PostgreSQL RLS and private files','Scope enforced before queries, downloads, retrieval and worker steps')
-    d.line([(1200,285),(1200,320),(1385,320),(1385,640),(950,640)],fill='#087F8C',width=4)
+    box(d,(300,685,1120,800),'PostgreSQL RLS and protected files','Scope enforced before queries, downloads, retrieval and worker steps')
+    d.line([(1200,285),(1200,320),(1385,320),(1385,640),(950,640)],fill='#164B99',width=4)
     arrow(d,(950,640),(950,685))
     arrow(d,(710,565),(710,685))
     im.save(ASSETS/'access_model.png')
@@ -184,7 +184,7 @@ def hyperlink(p, text, target):
     rid=part.relate_to(target,'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink',is_external=True)
     h=OxmlElement('w:hyperlink'); h.set(qn('r:id'),rid)
     r=OxmlElement('w:r'); pr=OxmlElement('w:rPr')
-    color=OxmlElement('w:color'); color.set(qn('w:val'),'087F8C'); pr.append(color)
+    color=OxmlElement('w:color'); color.set(qn('w:val'),'164B99'); pr.append(color)
     r.append(pr); t=OxmlElement('w:t'); t.text=text; r.append(t); h.append(r); p._p.append(h)
 
 def inline(p,text):
@@ -216,7 +216,7 @@ def table(doc,rows):
         for j,cell in enumerate(cells):
             cell.width=Inches(widths[j]); cell.vertical_alignment=WD_CELL_VERTICAL_ALIGNMENT.CENTER
             tcpr=cell._tc.get_or_add_tcPr()
-            sh=OxmlElement('w:shd'); sh.set(qn('w:fill'),'17354D' if i==0 else 'F0F5F8' if i%2==0 else 'FFFFFF'); tcpr.append(sh)
+            sh=OxmlElement('w:shd'); sh.set(qn('w:fill'),'164B99' if i==0 else 'FFFFFF' if i%2==0 else 'FFFFFF'); tcpr.append(sh)
             margins=OxmlElement('w:tcMar')
             for side,val in [('top','85'),('bottom','85'),('left','110'),('right','110')]:
                 e=OxmlElement('w:'+side); e.set(qn('w:w'),val); e.set(qn('w:type'),'dxa'); margins.append(e)
@@ -231,7 +231,7 @@ def table(doc,rows):
         trpr.append(OxmlElement('w:cantSplit'))
     borders=OxmlElement('w:tblBorders')
     for side in ('top','left','bottom','right','insideH','insideV'):
-        e=OxmlElement('w:'+side); e.set(qn('w:val'),'single'); e.set(qn('w:sz'),'4'); e.set(qn('w:color'),'D9D9D9'); borders.append(e)
+        e=OxmlElement('w:'+side); e.set(qn('w:val'),'single'); e.set(qn('w:sz'),'4'); e.set(qn('w:color'),'F4C430'); borders.append(e)
     t._tbl.tblPr.append(borders)
     doc.add_paragraph().paragraph_format.space_after=Pt(2)
 
@@ -247,10 +247,10 @@ def word(name,md):
     styles['Normal'].font.size=Pt(10.5)
     styles['Normal'].paragraph_format.space_after=Pt(7)
     styles['Normal'].paragraph_format.line_spacing=1.08
-    styles['Title'].font.size=Pt(26); styles['Title'].font.bold=True
+    styles['Title'].font.color.rgb=RGBColor.from_string('164B99'); styles['Title'].font.size=Pt(26); styles['Title'].font.bold=True
     styles['Title'].paragraph_format.space_after=Pt(12)
     for n,sz in [('Heading 1',15),('Heading 2',12),('Heading 3',11)]:
-        styles[n].font.size=Pt(sz); styles[n].font.bold=True
+        styles[n].font.color.rgb=RGBColor.from_string('164B99'); styles[n].font.size=Pt(sz); styles[n].font.bold=True
         styles[n].paragraph_format.space_before=Pt(13); styles[n].paragraph_format.space_after=Pt(6)
     header=sec.header.paragraphs[0]; header.add_run('SANDHĀTĀ   |   FDE DELIVERY BASELINE').font.size=Pt(8)
     footer=sec.footer.paragraphs[0]; footer.alignment=WD_ALIGN_PARAGRAPH.RIGHT
@@ -290,7 +290,7 @@ def word(name,md):
         i+=1
     doc.core_properties.title=md.splitlines()[0][2:]
     doc.core_properties.author='Prepared for Hema Chepuri'
-    doc.core_properties.subject='Sandhātā Forward Deployed Engineering delivery baseline'
+    doc.core_properties.subject='SANDHĀTĀ Forward Deployed Engineering delivery baseline'
     doc.save(WORD/(name+'.docx'))
 
 def main():

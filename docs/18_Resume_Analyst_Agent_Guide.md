@@ -1,4 +1,4 @@
-# Sandhātā Resume Analyst Agent Guide
+# SANDHĀTĀ Resume Analyst Agent Guide
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -6,7 +6,7 @@ This document specifies the intended implementation. Application code, test resu
 
 ## Mission and evidence boundary
 
-Build a faithful, versioned profile from the resume the user explicitly selected. The analyst extracts stated evidence; it does not manufacture missing experience, merge different resume versions or infer protected characteristics. A resume is private untrusted input, including any instructions written inside it.
+Build a faithful, versioned profile from the resume the user explicitly selected. The analyst extracts stated evidence; it does not manufacture missing experience, merge different resume versions or infer protected characteristics. A resume is protected untrusted input, including any instructions written inside it.
 
 ## Input and output contract
 
@@ -22,7 +22,7 @@ Distinguish explicit skill mentions from skill evidence in actual work. Deduplic
 
 ## Tools and permissions
 
-Allowed tools are private file read for the selected version, parser, passage index and schema/evidence validator. No network fetch, employer application, tracker update or cross-resume search is available. The service persists validated output under the original version. Deletion removes profile and passage content from active storage and invalidates dependent caches.
+Allowed tools are protected file read for the selected version, parser, passage index and schema/evidence validator. No network fetch, employer application, tracker update or cross-resume search is available. The service persists validated output under the original version. Deletion removes profile and passage content from active storage and invalidates dependent caches.
 
 ## Example output behavior
 
@@ -30,12 +30,12 @@ If a project says implemented ETL pipelines with Python and AWS, extract Python,
 
 ## Failure handling and acceptance
 
-Malformed or encrypted files fail clearly with no persisted partial original left behind. Sparse parse warnings block confident comparison until the user reviews text. Validate every extracted quote literally. Test multi-column PDFs, bulleted DOCX, overlapping dates, unknown dates, injection text and deletion. Telemetry records file hash, parser version, page count, warnings and duration, excluding text, file names with personal details and private paths. Proposed module path is src/sandhata/agents/resume.py.
+Malformed or encrypted files fail clearly with no persisted partial original left behind. Sparse parse warnings block confident comparison until the user reviews text. Validate every extracted quote literally. Test multi-column PDFs, bulleted DOCX, overlapping dates, unknown dates, injection text and deletion. Telemetry records file hash, parser version, page count, warnings and duration, excluding text, file names with personal details and protected paths. Proposed module path is src/sandhata/agents/resume.py.
 
-## Family permission contract
+## User permission contract
 
-All inputs carry a server-resolved Principal; tools and service code enforce its tenant, owner, active membership and auth_version. Never accept a model-provided owner_id or administrator role as authority. Every read, write, cache, checkpoint and model context is scoped before execution. A model cannot switch family members, activate an account, grant roles or run housekeeping.
+All inputs carry a server-resolved Principal; tools and service code enforce its tenant, owner, active membership and auth_version. Never accept a model-provided owner_id or administrator role as authority. Every read, write, cache, checkpoint and model context is scoped before execution. A model cannot switch user members, activate an account, grant roles or run housekeeping.
 
-Only public provider payloads may be shared in cache. Resume evidence, imported descriptions, personal queries, tracker events and assessments remain private. Workers recheck membership before protected steps and stop on suspension. Missing scope fails closed. Administrator status does not grant access to another member's career content. Cross-user requests abstain or return a safe denial, even if a guessed record ID exists.
+Only public provider payloads may be shared in cache. Resume evidence, imported descriptions, personal queries, tracker events and assessments remain protected. Workers recheck membership before protected steps and stop on suspension. Missing scope fails closed. Administrator status does not grant access to another member's career content. Cross-user requests abstain or return a safe denial, even if a guessed record ID exists.
 
-Required verification includes member A requesting member B evidence, cache reuse, forged IDs/role instructions and a suspended user's queued run. Log opaque scope IDs and safe outcomes, never private prompt or resume text. Account management and cleanup belong to deterministic admin services, not this agent.
+Required verification includes member A requesting member B evidence, cache reuse, forged IDs/role instructions and a suspended user's queued run. Log opaque scope IDs and safe outcomes, never protected prompt or resume text. Account management and cleanup belong to deterministic admin services, not this agent.

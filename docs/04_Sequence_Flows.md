@@ -1,4 +1,4 @@
-# Sandhātā Sequence Flows
+# SANDHĀTĀ Sequence Flows
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -43,12 +43,12 @@ A local MCP client calls search_saved_jobs or get_job_detail. The adapter valida
 
 ## Delete and restore
 
-Deleting a resume removes its original, parsed text, passages, checkpoints and dependent private match evidence from active storage. Application history may retain a tombstoned resume label without content. Backup expiry and restore-time deletion replay prevent reintroducing deleted content. A restore uses a stopped app or a coordinated PostgreSQL and private-file backup; integrity and representative file hashes are checked before the worker restarts.
+Deleting a resume removes its original, parsed text, passages, checkpoints and dependent protected match evidence from active storage. Application history may retain a tombstoned resume label without content. Backup expiry and restore-time deletion replay prevent reintroducing deleted content. A restore uses a stopped app or a coordinated PostgreSQL and protected-file backup; integrity and representative file hashes are checked before the worker restarts.
 
 ## Sign in invitation and administration
 
 1. An existing administrator creates a single-use, expiring invitation; only its hash is stored. Copying the invitation link does not send email automatically.
-2. The family member signs in through OIDC. The service verifies identity and invitation binding, consumes the invitation atomically, and resolves active membership.
+2. The user member signs in through OIDC. The service verifies identity and invitation binding, consumes the invitation atomically, and resolves active membership.
 3. Each protected request resolves Principal, establishes transaction-local PostgreSQL scope, and authorizes records before rendering or invoking tools.
 4. An administrator opens the separate console. The service rechecks the current administrator role, validates the requested action, and previews affected metadata.
 5. On an explicit confirmed mutation, the service commits membership/configuration changes and an audit event in one transaction. Suspension increments auth_version and revokes pending work authority.

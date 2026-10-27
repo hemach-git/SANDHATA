@@ -1,0 +1,9 @@
+body,body.kcBodyClass,.login-pf body{background:#FFFFFF!important;color:#123263!important;font-family:Arial,sans-serif!important}
+#kc-header,#kc-header-wrapper{color:#164B99!important;font-size:30px!important;font-weight:800!important;letter-spacing:.08em!important;text-transform:uppercase}
+.card-pf,.pf-v5-c-login__main,.pf-v5-c-card{background:#FFFFFF!important;border:1px solid #F4C430!important;border-top:4px solid #F4C430!important;border-radius:12px!important;box-shadow:0 8px 28px #164B9910!important}
+#kc-page-title,h1,h2,label{color:#123263!important}
+.pf-c-button.pf-m-primary,.pf-v5-c-button.pf-m-primary,#kc-login{background:#164B99!important;color:#FFFFFF!important;border:2px solid #F4C430!important;border-radius:8px!important;min-height:42px!important}
+#kc-login:hover,.pf-c-button.pf-m-primary:hover,.pf-v5-c-button.pf-m-primary:hover{background:#F4C430!important;color:#123263!important}
+input{background:#FFFFFF!important;color:#123263!important;border:1px solid #CBD7E8!important;border-radius:6px!important}
+input:focus,button:focus-visible,a:focus-visible{outline:3px solid #F4C430!important;outline-offset:2px!important}
+a{color:#164B99!important}

@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-27",
+  "application": "SANDHATA",
+  "root_folder": "SANDHATA",
+  "reference": "BRIHASPATI landing structure",
+  "palette": {
+    "background": "#FFFFFF",
+    "blue": "#164B99",
+    "highlight": "#F4C430"
+  },
+  "browser_verified": [
+    "landing",
+    "OIDC theme",
+    "administrator sign-in",
+    "Discover",
+    "Resume Library",
+    "Tracker",
+    "Insights",
+    "Admin Console"
+  ],
+  "automated_tests": 61,
+  "document_pairs": 25,
+  "rendered_pages_reviewed": 65,
+  "original_evidence": "preserved verbatim",
+  "responsive_layout": "CSS breakpoints and AppTest verified; mobile device review remains outside this desktop check",
+  "landing_authentication": "Actual provider-owned form in shared landing; automatic local OIDC entry; successful submit returned to workspace; account-switch control verified",
+  "landing_cards": "Bold text and bright sandalwood #F4C430 fill"
+}

@@ -10,7 +10,7 @@ STATUSES=['Saved','Preparing','Applied','Screening','Interviewing','Offer','Hire
 
 def private_path(key):
     path=(DATA/key).resolve()
-    if not path.is_relative_to(DATA.resolve()): raise AppError('Invalid private object reference.')
+    if not path.is_relative_to(DATA.resolve()): raise AppError('Invalid document reference.')
     return path
 
 def index_text(c,p,parent_id,parent_type,body):

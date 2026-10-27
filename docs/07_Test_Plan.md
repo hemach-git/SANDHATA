@@ -1,4 +1,4 @@
-# Sandhātā Test Plan
+# SANDHĀTĀ Test Plan
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -25,9 +25,9 @@ Test contracts, calculations, storage and failure behavior with deterministic fi
 | T11 | Repeat tracker request after UI rerun | Single status event for request ID |
 | T12 | Reopen or correct status | Auditable event history, correct current state |
 | T13 | Worker killed during comparison | Lease expires; bounded recovery without duplicate write |
-| T14 | Resume deleted | File, passages and private assessment evidence removed |
+| T14 | Resume deleted | File, passages and protected assessment evidence removed |
 | T15 | HTML script or prompt injection in job | Script not executed; embedded instructions ignored |
-| T16 | User URL targets localhost or redirect | Fetch blocked before private network access |
+| T16 | User URL targets localhost or redirect | Fetch blocked before protected network access |
 | T17 | App restarted | Jobs, resumes and tracker persist |
 | T18 | Analytics fixed fixture | Counts and denominators match expected values |
 | T19 | MCP unknown tool or oversized request | Bounded schema error; no write capability |
@@ -49,14 +49,14 @@ On the declared test machine with 500 saved jobs, target p95 saved-job search un
 
 All critical T cases pass; no unresolved critical privacy, security or data-loss defect; eval gate passes; owner can complete the real workflow. A skipped live connector test is reported as not verified, with the affected capability labeled accordingly. Regression failures need reproduction, fix and a targeted rerun before broad release validation.
 
-## Family isolation and administrator cases
+## User isolation and administrator cases
 
 | ID | Scenario | Required result |
 | --- | --- | --- |
 | T21 | Uninvited OIDC identity | Sign-in establishes no application membership |
 | T22 | Replayed, expired or wrong-identity invitation | Redemption denied without activating membership |
 | T23 | Member A guesses member B record IDs | All service, page, download and export paths deny access |
-| T24 | Two users issue identical queries | Private caches and assessments remain separate |
+| T24 | Two users issue identical queries | Protected caches and assessments remain separate |
 | T25 | Missing RLS scope or cross-owner foreign key | Query/write denied; no data leaked through error details |
 | T26 | Member invokes admin callback directly | Denied server-side; hiding navigation alone is insufficient |
 | T27 | Suspend or demote an active account | Next protected operation and queued step denied |
@@ -66,4 +66,4 @@ All critical T cases pass; no unresolved critical privacy, security or data-loss
 | T31 | Five simultaneous sessions | No identity, file, cache, worker or connection-pool scope leakage |
 | T32 | Logout/login as another member in same browser | No prior member state or download becomes visible |
 
-Use two synthetic member accounts, an administrator and an uninvited identity. Run integration tests against a real disposable PostgreSQL instance with the production application role and forced RLS. Include error/rollback connection-pool reuse, manipulated owner fields and CSV/MCP/private-file paths. Repeat key checks after backup restore and schema migration. No family-accessible release passes while T21 through T32 are failed or unrun.
+Use two synthetic member accounts, an administrator and an uninvited identity. Run integration tests against a real disposable PostgreSQL instance with the production application role and forced RLS. Include error/rollback connection-pool reuse, manipulated owner fields and CSV/MCP/private-file paths. Repeat key checks after backup restore and schema migration. No user-accessible release passes while T21 through T32 are failed or unrun.

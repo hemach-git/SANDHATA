@@ -16,7 +16,7 @@ def csv_bytes(records):
         frame[col]=frame[col].map(lambda v:"'"+v if isinstance(v,str) and v.lstrip().startswith(('=','+','-','@')) else v)
     return frame.to_csv(index=False).encode('utf-8-sig')
 
-async def health(request): return JSONResponse({'service':'sandhata-private-downloads','status':'ready'})
+async def health(request): return JSONResponse({'service':'SANDHATA-downloads','status':'ready'})
 
 async def download(request):
     header=request.headers.get('authorization','')
@@ -25,15 +25,15 @@ async def download(request):
         p=capability_principal(header[7:])
         kind=request.path_params['kind'];identifier=request.path_params.get('identifier','')
         if kind=='resume':
-            data,ext=resume_download(p,identifier); filename='resume'+ext;media='application/octet-stream'
+            data,ext=resume_download(p,identifier); filename='SANDHATA_RESUME'+ext;media='application/octet-stream'
         elif kind=='jobs':
             data=csv_bytes([{k:v for k,v in j.items() if k not in ('body','raw_html')} for j in list_jobs(p,limit=200)])
-            filename='my_jobs.csv';media='text/csv'
-        elif kind=='tracker': data=csv_bytes(list_applications(p));filename='my_applications.csv';media='text/csv'
-        elif kind=='audit': data=csv_bytes(audit_events(p));filename='admin_audit.csv';media='text/csv'
+            filename='SANDHATA_JOBS.csv';media='text/csv'
+        elif kind=='tracker': data=csv_bytes(list_applications(p));filename='SANDHATA_APPLICATIONS.csv';media='text/csv'
+        elif kind=='audit': data=csv_bytes(audit_events(p));filename='SANDHATA_AUDIT.csv';media='text/csv'
         elif kind=='cohort':
             start=date.fromisoformat(request.query_params['start']);end=date.fromisoformat(request.query_params['end'])
-            data=csv_bytes(tracker_metrics(p,start,end)['cohort']);filename='my_cohort.csv';media='text/csv'
+            data=csv_bytes(tracker_metrics(p,start,end)['cohort']);filename='SANDHATA_COHORT.csv';media='text/csv'
         else: return JSONResponse({'error':'Not found'},status_code=404)
         return Response(data,media_type=media,headers={'Content-Disposition':f'attachment; filename="{filename}"','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'})
     except AppError: return JSONResponse({'error':'Unavailable or access revoked'},status_code=403)

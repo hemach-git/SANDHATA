@@ -1,4 +1,4 @@
-# Sandhātā Risks Decisions and Release Evidence
+# SANDHĀTĀ Risks Decisions and Release Evidence
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -6,7 +6,7 @@ This document specifies the intended implementation. Application code, test resu
 
 ## Current baseline
 
-The owner selected Sandhātā with ASCII identifier sandhata, requested paired Markdown and DOCX documents, and created https://github.com/hemach-git/sandhata. The proposed implementation is an invite-only family Streamlit application with OIDC, explicit authorization, PostgreSQL RLS, bounded agent coordination and assisted premium imports. A local pilot is implemented; document 23 records its tested subset and remaining gates. GitHub network commands will be run collaboratively by the owner. Public branding clearance and hosting selection remain open.
+The owner selected SANDHĀTĀ with ASCII identifier sandhata, requested paired Markdown and DOCX documents, and created https://github.com/hemach-git/sandhata. The proposed implementation is an invite-only user Streamlit application with OIDC, explicit authorization, PostgreSQL RLS, bounded agent coordination and assisted premium imports. A local pilot is implemented; document 23 records its tested subset and remaining gates. GitHub network commands will be run collaboratively by the owner. Public branding clearance and hosting selection remain open.
 
 ## Risk register
 
@@ -15,7 +15,7 @@ The owner selected Sandhātā with ASCII identifier sandhata, requested paired M
 | Premium account lacks API rights | Automated source coverage reduced | Assisted import; owner verifies approved access |
 | Two-day capacity overrun | Scope or date missed | Vertical slice first; collaborator reports remaining work |
 | Model fabricates evidence | Misleading fit judgment | Literal validation, reviewed evals, suppress invalid score |
-| Resume privacy leak | Private data disclosure | Private storage, redaction, no personal data in Git |
+| Resume privacy leak | Protected data disclosure | Protected storage, redaction, no personal data in Git |
 | Database data loss | Tracker unavailable | Consistent backup, restore drill, one-host topology |
 | UI fails quality target | Poor usability | Visual gate and early owner walkthrough |
 | Weak extraction on PDFs | Incomplete comparison | Parse preview, unknown labels, OCR deferred |
@@ -28,7 +28,7 @@ D01 uses the FDE sequence Embed, Solve, Generalize, Productize, adapted to the o
 
 ## Open decisions
 
-Select local or hosted model after hardware and privacy review. Select production host, domain and authentication provider. Confirm repository visibility. Confirm whether an approved private API exists for any premium source. Obtain owner sample jobs/resumes without committing them. These are implementation inputs rather than reasons to stop independent document preparation.
+Select local or hosted model after hardware and privacy review. Select production host, domain and authentication provider. Confirm repository visibility. Confirm whether an approved protected API exists for any premium source. Obtain owner sample jobs/resumes without committing them. These are implementation inputs rather than reasons to stop independent document preparation.
 
 ## Release evidence ledger
 
@@ -37,7 +37,7 @@ Select local or hosted model after hardware and privacy review. Select productio
 | Document preparation | Matched MD/DOCX and visual QA report | Generated and checked during authoring; consult manifest |
 | Source publication | Local SHA matches remote SHA | Pending owner Git commands |
 | Local application | Setup and end-to-end workflow evidence | Local synthetic import, resume and comparison walkthrough verified |
-| Tests | Commit-linked test report | 58 automated cases passed; see verification/application_tests.txt |
+| Tests | Commit-linked test report | 61 automated cases passed; see verification/application_tests.txt |
 | AI evals | Dataset, versions and threshold results | Three local synthetic smoke cases; full reviewed benchmark pending |
 | UI review | Screenshots and owner walkthrough | Local synthetic browser walkthrough; full accessibility audit pending |
 | Recovery | Timed restore and integrity report | Encrypted backup and isolated database restore verified |
@@ -45,7 +45,7 @@ Select local or hosted model after hardware and privacy review. Select productio
 
 ## Source and naming notes
 
-Sandhātā draws inspiration from the Vishnu Sahasranama, with an interpreted connection between actions and their results. The English acronym is an original product expansion, not a literal translation. Traditional commentary varies. See https://www.sadagopan.org/ebook/pdf/Vishnu%20Sahasranama%20v1.pdf. Prior naming research found existing uses of Sandhi AI and Sthiraa; no domain/trademark clearance is claimed for the selected name.
+SANDHĀTĀ draws inspiration from the Vishnu Sahasranama, with an interpreted connection between actions and their results. The English acronym is an original product expansion, not a literal translation. Traditional commentary varies. See https://www.sadagopan.org/ebook/pdf/Vishnu%20Sahasranama%20v1.pdf. Prior naming research found existing uses of Sandhi AI and Sthiraa; no domain/trademark clearance is claimed for the selected name.
 
 ## Verified source references
 
@@ -64,12 +64,12 @@ Access checked October 26 2026. Recheck access conditions before enabling a conn
 - Promptfoo assertions: https://www.promptfoo.dev/docs/configuration/expected-outputs/
 - Langfuse self hosting: https://langfuse.com/self-hosting
 
-## Family scope change and release risks
+## User scope change and release risks
 
-ADR06 supersedes personal-only SQLite storage with PostgreSQL RLS. ADR07 requires invite-only OIDC plus service authorization. ADR08 defines member/admin roles and private career data. ADR09 reserves administrative mutations for deterministic, audited services. ADR10 makes account isolation, revocation and concurrent-session tests release blockers.
+ADR06 supersedes personal-only SQLite storage with PostgreSQL RLS. ADR07 requires invite-only OIDC plus service authorization. ADR08 defines member/admin roles and protected career data. ADR09 reserves administrative mutations for deterministic, audited services. ADR10 makes account isolation, revocation and concurrent-session tests release blockers.
 
 New risks are leaked shared caches, reused connection scope, exposed object URLs, stale sessions, overprivileged admin tools and backups that reactivate suspended accounts. Mitigate them with owner-keyed caches, transaction-local scope, authorized downloads, auth_version checks, metadata-only admin queries and restore-time revocation replay. Infrastructure operators still have privileged access to storage; application role boundaries cannot remove that trust.
 
-The two-day estimate must be reforecast after the authenticated two-account slice. Public registration, shared resumes, cross-family collaboration, remote MCP and automatic portal-account sharing are excluded. Updated family implementation, admin UI, isolation tests and deployment remain planned until evidence is recorded.
+The two-day estimate must be reforecast after the authenticated two-account slice. Public registration, shared resumes, cross-user collaboration, remote MCP and automatic portal-account sharing are excluded. Updated user implementation, admin UI, isolation tests and deployment remain planned until evidence is recorded.
 
 Additional checked references: Streamlit OIDC https://docs.streamlit.io/develop/concepts/connections/authentication ; PostgreSQL RLS https://www.postgresql.org/docs/18/ddl-rowsecurity.html ; Keycloak administration https://www.keycloak.org/docs/latest/server_admin/ . OIDC supplies identity, not application authorization. PostgreSQL owners/superusers/BYPASSRLS roles can bypass ordinary row policies, so the runtime role must not have those privileges.

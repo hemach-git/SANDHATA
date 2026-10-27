@@ -1,4 +1,4 @@
-# Sandhātā Analytics Requirements and Design
+# SANDHĀTĀ Analytics Requirements and Design
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -49,4 +49,4 @@ Add cohort maturity comparisons, response-time survival analysis and richer sala
 
 Career metrics remain owner-scoped in SQL/RLS. Members cannot compare relatives' resumes, salaries or outcomes. Account timezone defaults to America/New_York and accompanies exports.
 
-Administrators see account activity, storage, model usage, failure counts, cache age and backup health. Career leaderboards and shared outcome reports are excluded; a small-family aggregate is not reliably anonymous. Test identical member queries, connection-pool reuse, exports and cache keys for isolation. Operational totals must reconcile without revealing private titles or notes.
+Administrators see account activity, storage, model usage, failure counts, cache age and backup health. Career leaderboards and shared outcome reports are excluded; a small-user aggregate is not reliably anonymous. Test identical member queries, connection-pool reuse, exports and cache keys for isolation. Operational totals must reconcile without revealing protected titles or notes.

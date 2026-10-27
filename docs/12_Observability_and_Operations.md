@@ -1,4 +1,4 @@
-# Sandhātā Observability and Operations Guide
+# SANDHĀTĀ Observability and Operations Guide
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -6,7 +6,7 @@ This document specifies the intended implementation. Application code, test resu
 
 ## Operational questions
 
-The owner must be able to tell whether a search completed, which connector failed, which evidence produced a score, and whether a tracker edit persisted. A Diagnostics page reads run records and safe aggregates. Logs support investigation without retaining private career content.
+The owner must be able to tell whether a search completed, which connector failed, which evidence produced a score, and whether a tracker edit persisted. A Diagnostics page reads run records and safe aggregates. Logs support investigation without retaining protected career content.
 
 ## Event contract
 
@@ -27,7 +27,7 @@ Thresholds are initial operating policies and require tuning. A public-feed dela
 
 ## Trace and cost review
 
-A trace links planner, connector, parse, retrieval, validation and score events. Store policy versions and content hashes, allowing replay with private fixtures without dumping content into telemetry. Hosted-model cost is calculated only when provider/model pricing is configured and current; otherwise display tokens and unknown cost. Local inference reports duration and model identity, not a fictional zero infrastructure cost.
+A trace links planner, connector, parse, retrieval, validation and score events. Store policy versions and content hashes, allowing replay with protected fixtures without dumping content into telemetry. Hosted-model cost is calculated only when provider/model pricing is configured and current; otherwise display tokens and unknown cost. Local inference reports duration and model identity, not a fictional zero infrastructure cost.
 
 ## Runbook
 
@@ -35,7 +35,7 @@ For no search results, inspect filters, source scope and source outcomes; distin
 
 ## Retention and escalation
 
-Keep sanitized logs for 14 days and checkpoints seven days initially. Retention cleanup is a tested maintenance operation. If private data appears in telemetry, disable logging of affected fields, restrict access, remove exposed copies and document scope before resuming. If a source rejects access, disable its connector and use assisted import. If a model fabricates evidence, suppress the assessment and rerun evaluation before enabling it.
+Keep sanitized logs for 14 days and checkpoints seven days initially. Retention cleanup is a tested maintenance operation. If protected data appears in telemetry, disable logging of affected fields, restrict access, remove exposed copies and document scope before resuming. If a source rejects access, disable its connector and use assisted import. If a model fabricates evidence, suppress the assessment and rerun evaluation before enabling it.
 
 ## Future tracing platform
 
@@ -43,7 +43,7 @@ Adopt OpenTelemetry and Langfuse core when richer cross-component debugging is n
 
 ## Administrator operations and privacy
 
-The Admin Console shows member states, opaque user IDs, last activity, storage and model-call usage, connector health, queue state, safe error codes, backup age and maintenance outcomes. Per-user resource metrics are visible to administrators for operations; resumes, search questions, job content, match rationales and tracker notes are not. Do not put private content into diagnostic exports, tool traces or raw exception strings.
+The Admin Console shows member states, opaque user IDs, last activity, storage and model-call usage, connector health, queue state, safe error codes, backup age and maintenance outcomes. Per-user resource metrics are visible to administrators for operations; resumes, search questions, job content, match rationales and tracker notes are not. Do not put protected content into diagnostic exports, tool traces or raw exception strings.
 
 Every invite, activation, suspension, role/quota/configuration change and maintenance action creates an append-only AdminAuditEvent with actor, tenant, action, target opaque ID, reason, safe before/after metadata, UTC timestamp and trace ID. Do not store raw invitation tokens. Keep audit metadata for 90 days by default, separate from 14-day sanitized operational logs. Unauthorized actions return safe denials and create security telemetry.
 

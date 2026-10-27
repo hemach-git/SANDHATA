@@ -10,7 +10,7 @@ from .parsing import salary_yearly
 
 def fetch_json(url,params=None):
     try:
-        with httpx.Client(timeout=20,follow_redirects=False,headers={'User-Agent':'Sandhata personal-family career workspace'}) as client:
+        with httpx.Client(timeout=20,follow_redirects=False,headers={'User-Agent':'SANDHATA career workspace'}) as client:
             r=client.get(url,params=params)
             r.raise_for_status()
             if len(r.content)>15*1024*1024: raise AppError('Source response exceeds the supported size.')

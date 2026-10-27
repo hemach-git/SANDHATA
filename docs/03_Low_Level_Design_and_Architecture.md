@@ -1,4 +1,4 @@
-# Sandhātā Low Level Design and Architecture
+# SANDHĀTĀ Low Level Design and Architecture
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -6,7 +6,7 @@ This document specifies the intended implementation. Application code, test resu
 
 ## Architecture decision
 
-Use one Streamlit application with OpenID Connect sign-in, a membership and authorization service, bounded LangGraph workflows, and PostgreSQL with row-level security and full-text search. Private file storage holds originals under opaque user-scoped keys. A separate worker polls durable tasks. The first deployment targets one invited family household with ten test accounts and five concurrent sessions; capacity must be measured before launch.
+Use one Streamlit application with OpenID Connect sign-in, a membership and authorization service, bounded LangGraph workflows, and PostgreSQL with row-level security and full-text search. Protected file storage holds originals under opaque user-scoped keys. A separate worker polls durable tasks. The first deployment targets one invited user household with ten test accounts and five concurrent sessions; capacity must be measured before launch.
 
 ![Application architecture](assets/architecture.png)
 
@@ -15,7 +15,7 @@ The browser calls presentation functions, which validate typed commands and invo
 ## Proposed source layout
 
 ```text
-sandhata/
+SANDHATA/
   app.py                    Streamlit navigation and page composition
   src/sandhata/
     config.py               validated environment and paths
@@ -29,14 +29,14 @@ sandhata/
     mcp_server.py           read-only stdio adapter
   tests/                    unit, integration and UI cases
   evals/                    synthetic fixtures and result records
-  deploy/                   container and private-host configuration
+  deploy/                   container and protected-host configuration
 ```
 
 These paths describe intended application code. The initial document package does not claim they exist.
 
 ## Data model
 
-All IDs are UUID strings; timestamps are stored in UTC and grouped using each member's saved timezone. Every private row carries tenant_id and owner_user_id. Composite foreign keys include tenant and owner to prevent mismatched parent references. Resume originals, database dumps and credentials never enter Git. Public feed cache data is separate from private searches, imported descriptions and saved records.
+All IDs are UUID strings; timestamps are stored in UTC and grouped using each member's saved timezone. Every protected row carries tenant_id and owner_user_id. Composite foreign keys include tenant and owner to prevent mismatched parent references. Resume originals, database dumps and credentials never enter Git. Public feed cache data is separate from protected searches, imported descriptions and saved records.
 
 | Entity | Key fields and constraints |
 | --- | --- |
@@ -44,7 +44,7 @@ All IDs are UUID strings; timestamps are stored in UTC and grouped using each me
 | Job | id, normalized title/company, location, workplace type, active state |
 | JobSource | job_id, provider, provider_job_id, original_url, employer_url, last_seen; unique provider and provider_job_id |
 | DescriptionVersion | id, job_id, raw_html, plain_text, hash, fetched_at, completeness, provenance |
-| ResumeVersion | id, label, hash, private file path, parsed text, parser_version, created_at |
+| ResumeVersion | id, label, hash, protected file path, parsed text, parser_version, created_at |
 | Passage | id, parent_type/id/version, section, offsets, text; FTS document |
 | MatchAssessment | id, resume_version_id, description_version_id, rubric/model/prompt versions, evidence_json, score, coverage |
 | Application | id, job_id, resume_version_id, status, applied_at, notes; unique tenant_id, owner_user_id and job_id for the current tracker item |
@@ -72,11 +72,11 @@ Import validates then inserts canonical/source/version/index changes in one tran
 
 ## Security and operating limits
 
-Uploads allow text PDF and DOCX, maximum 10 MB and 50 pages as initial configurable limits. Reject mismatched magic types, encrypted files and oversized archives. Render escaped text or sanitized HTML without script execution. Fetch only supported HTTPS connector endpoints; validate redirect destinations and block private/local addresses for user URLs. Set initial request timeout 15 seconds, two retries with jitter, max 50 candidates and 20 model comparisons per run. These are configuration defaults to validate, not measured capacity.
+Uploads allow text PDF and DOCX, maximum 10 MB and 50 pages as initial configurable limits. Reject mismatched magic types, encrypted files and oversized archives. Render escaped text or sanitized HTML without script execution. Fetch only supported HTTPS connector endpoints; validate redirect destinations and block protected/local addresses for user URLs. Set initial request timeout 15 seconds, two retries with jitter, max 50 candidates and 20 model comparisons per run. These are configuration defaults to validate, not measured capacity.
 
 ## Architecture tradeoffs
 
-PostgreSQL adds setup and backup work but is the family-release baseline for concurrent access and defense-in-depth isolation. SQLite is no longer a supported production design. A single host remains a capacity and availability constraint. Streamlit accelerates the workflow; a React frontend becomes a separate decision if the visual acceptance gate cannot be met. FastAPI is deferred because v1 needs no independent public API. The MCP adapter calls the same services and does not add a second business implementation.
+PostgreSQL adds setup and backup work but is the user-release baseline for concurrent access and defense-in-depth isolation. SQLite is no longer a supported production design. A single host remains a capacity and availability constraint. Streamlit accelerates the workflow; a React frontend becomes a separate decision if the visual acceptance gate cannot be met. FastAPI is deferred because v1 needs no independent public API. The MCP adapter calls the same services and does not add a second business implementation.
 
 ## Identity authorization and privacy
 
@@ -84,16 +84,16 @@ Streamlit st.login identifies the OIDC subject; authorization is a separate appl
 
 Protected pages, callbacks, downloads, retrieval, exports, model calls, background steps and admin services resolve membership server-side. Suspended memberships fail closed. A request-local Principal is not a globally cached object. Sessions have an idle timeout policy of 30 minutes and an absolute application lifetime of eight hours as initial configurable defaults; the application checks these independently of the OIDC cookie lifetime. Role or account changes increment auth_version and invalidate application sessions and task authority.
 
-PostgreSQL enables and forces RLS on private tables. In each transaction the service uses transaction-local tenant/user settings from Principal. Policies use both USING and WITH CHECK; missing scope denies access. The application role is not a table owner, superuser or BYPASSRLS role. Migrations use a separate role. Connection pooling must reset scope after commit/rollback. RLS protects against accidental unscoped queries; trusted application services must still resist tampering and validate references.
+PostgreSQL enables and forces RLS on protected tables. In each transaction the service uses transaction-local tenant/user settings from Principal. Policies use both USING and WITH CHECK; missing scope denies access. The application role is not a table owner, superuser or BYPASSRLS role. Migrations use a separate role. Connection pooling must reset scope after commit/rollback. RLS protects against accidental unscoped queries; trusted application services must still resist tampering and validate references.
 
-Private caches include tenant/user/version/policy in their keys. Shared caches contain only public provider payloads and never resume text, personalized search requests, matches or imported private descriptions. Files are stored as tenant/user/opaque-ID objects, resolved through an authorized download service. Neither a filesystem path nor a signed link is accepted as authority to another member's file. No private content enters global Streamlit resource caches.
+Protected caches include tenant/user/version/policy in their keys. Shared caches contain only public provider payloads and never resume text, personalized search requests, matches or imported protected descriptions. Files are stored as tenant/user/opaque-ID objects, resolved through an authorized download service. Neither a filesystem path nor a signed link is accepted as authority to another member's file. No protected content enters global Streamlit resource caches.
 
 
 ## Account and administration records
 
 | Entity | Required fields and constraints |
 | --- | --- |
-| Tenant | id, label, state; initially one family household |
+| Tenant | id, label, state; initially one user household |
 | User | id, oidc_issuer, oidc_subject, display_name, timezone; unique issuer and subject |
 | Membership | tenant_id, user_id, role member/admin, state, auth_version; unique tenant/user |
 | Invitation | tenant_id, intended_identity_hash, role, token_hash, expiry, redeemed_at, inviter |

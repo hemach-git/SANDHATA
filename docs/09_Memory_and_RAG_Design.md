@@ -1,4 +1,4 @@
-# Sandhātā Memory and RAG Design
+# SANDHĀTĀ Memory and RAG Design
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -39,7 +39,7 @@ Preference changes affect new runs; prior results retain prior inputs. Job refre
 
 ## Privacy and future semantic search
 
-Do not send contact details to hosted models when not needed. Keep private uploads and indexes outside the repository, with OS permissions and encrypted host storage. If measured lexical recall is inadequate, add local embeddings and pgvector after selecting PostgreSQL or a measured local vector option. Embedding indexes inherit the same version filters, deletion rules and privacy restrictions. RAG quality is evaluated using the queries and gates in document 08.
+Do not send contact details to hosted models when not needed. Keep protected uploads and indexes outside the repository, with OS permissions and encrypted host storage. If measured lexical recall is inadequate, add local embeddings and pgvector after selecting PostgreSQL or a measured local vector option. Embedding indexes inherit the same version filters, deletion rules and privacy restrictions. RAG quality is evaluated using the queries and gates in document 08.
 
 ## Multi user memory isolation
 
@@ -47,4 +47,4 @@ Every preference, imported job, description, passage, resume, match, tracker eve
 
 PostgreSQL full-text queries apply the authenticated owner scope in SQL/RLS before ranking or limiting. No shared FTS index result set may be filtered only after retrieval, because ranking, snippets and counts can disclose other members' data. Conversations and checkpoints use tenant/user/run keys. Embeddings, if added, require the same pre-retrieval isolation and deletion rules.
 
-Administration queries expose account, storage and operational metadata only. Per-member career analytics remain private; household metrics aggregate system usage rather than resumes, skill gaps or application outcomes. Erasure removes active files/indexes/checkpoints and private derived content; backup tombstones survive until affected backups expire. Never cascade deletion from a shared public feed cache into unrelated member records.
+Administration queries expose account, storage and operational metadata only. Per-member career analytics remain protected; household metrics aggregate system usage rather than resumes, skill gaps or application outcomes. Erasure removes active files/indexes/checkpoints and protected derived content; backup tombstones survive until affected backups expire. Never cascade deletion from a shared public feed cache into unrelated member records.

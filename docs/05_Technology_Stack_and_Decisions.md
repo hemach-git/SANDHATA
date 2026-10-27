@@ -1,4 +1,4 @@
-# Sandhātā Technology Stack and Decisions
+# SANDHĀTĀ Technology Stack and Decisions
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -10,7 +10,7 @@ Select the smallest stack that supports all critical acceptance paths. Pin resol
 
 | Layer | Selection | Reason |
 | --- | --- | --- |
-| UI | Streamlit and theme CSS within supported boundaries | Fast authenticated family dashboard delivery |
+| UI | Streamlit and theme CSS within supported boundaries | Fast authenticated user dashboard delivery |
 | Charts | Plotly | Interactive funnels, bars and trends |
 | Validation | Pydantic | Explicit input and output contracts |
 | Workflow | LangGraph OSS | Typed state and bounded graph execution |
@@ -21,7 +21,7 @@ Select the smallest stack that supports all critical acceptance paths. Pin resol
 | AI evaluation | pytest fixtures; Promptfoo optional comparison harness | Evidence and regression checks |
 | MCP | Official Python MCP SDK after compatibility verification | Local read-only interoperability |
 | Observability | JSON logs, run table and diagnostics page | Minimal operational footprint |
-| Packaging | OCI image and Compose; Podman or Docker Engine | Reproducible private deployment |
+| Packaging | OCI image and Compose; Podman or Docker Engine | Reproducible protected deployment |
 | Source control | Git with GitHub repository | Owner-selected collaboration destination |
 
 ## Open source boundary
@@ -30,11 +30,11 @@ GitHub is a hosted service choice, not an open-source dependency claim. Hosted m
 
 ## Decisions and alternatives
 
-ADR01 is superseded by ADR06: family access requires PostgreSQL from the first deployable build. ADR02 chooses lexical retrieval plus structured evidence because exact skills and source citations matter more than broad semantic recall in v1. Embeddings are a later enhancement, not a prerequisite for RAG. ADR03 chooses Streamlit over React to protect the schedule; the UI gate still tests layout and accessibility. ADR04 chooses service functions over a separate FastAPI layer, avoiding duplicated validation. ADR05 keeps MCP local and read-only.
+ADR01 is superseded by ADR06: user access requires PostgreSQL from the first deployable build. ADR02 chooses lexical retrieval plus structured evidence because exact skills and source citations matter more than broad semantic recall in v1. Embeddings are a later enhancement, not a prerequisite for RAG. ADR03 chooses Streamlit over React to protect the schedule; the UI gate still tests layout and accessibility. ADR04 chooses service functions over a separate FastAPI layer, avoiding duplicated validation. ADR05 keeps MCP local and read-only.
 
 ## Model selection
 
-Start with one model profile capable of structured extraction. Benchmark a Qwen-family model sized for available hardware, or configure an owner-selected hosted provider. No specific local model is promised until memory, context length and latency are tested. Store model identifier and provider settings with every assessment. CPU-only operation may require fewer simultaneous comparisons. A model outage must not block search of saved jobs or tracker updates.
+Start with one model profile capable of structured extraction. Benchmark a Qwen-user model sized for available hardware, or configure an owner-selected hosted provider. No specific local model is promised until memory, context length and latency are tested. Store model identifier and provider settings with every assessment. CPU-only operation may require fewer simultaneous comparisons. A model outage must not block search of saved jobs or tracker updates.
 
 ## Dependency discipline
 
@@ -44,7 +44,7 @@ Use a project-local virtual environment and a lock generated from declared requi
 
 Add embeddings for measured recall gaps, FastAPI for external application clients, and a separate tracing platform when JSON runs no longer support debugging. Each change gets an ADR, migration plan and eval rerun rather than being added solely for architectural appearance.
 
-## Family deployment decisions
+## User deployment decisions
 
 ADR06 supersedes the SQLite/FTS5 choice: use PostgreSQL full-text search and RLS with SQLAlchemy/Alembic. Test against PostgreSQL rather than substituting SQLite in integration tests. OIDC uses Streamlit's supported authentication surface with explicit application authorization. Reuse an available Google/Microsoft OIDC provider for the fastest setup; Keycloak is the open-source self-hosted alternative when its setup and operations can fit the delivery budget. Password storage and password resets remain the identity provider's responsibility.
 

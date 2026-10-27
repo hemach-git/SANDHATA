@@ -1,4 +1,4 @@
-# Sandhātā Coordinator Agent Guide
+# SANDHĀTĀ Coordinator Agent Guide
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -28,16 +28,16 @@ Allowed tools are profile read, connector fetch, resume profile read, evidence r
 
 ## Example and failure response
 
-For a search across Remotive and a manual-only source, return Remotive records plus the assisted-import entry point, with separate source outcomes. If the model is offline, preserve the saved job and show comparison unavailable. If the resume is deleted mid-run, fail with selected_resume_unavailable and discard private uncommitted evidence. Do not silently select another resume.
+For a search across Remotive and a manual-only source, return Remotive records plus the assisted-import entry point, with separate source outcomes. If the model is offline, preserve the saved job and show comparison unavailable. If the resume is deleted mid-run, fail with selected_resume_unavailable and discard protected uncommitted evidence. Do not silently select another resume.
 
 ## Verification and telemetry
 
-Tests cover invalid routes, duplicate request IDs, exhausted budgets, lease recovery, cancellation and source partial failures. Record node durations, outcomes, version IDs and retry counts without raw private text. Acceptance requires a trace showing all intended handoffs and a failure trace proving bounded recovery. Proposed module path is src/sandhata/agents/coordinator.py.
+Tests cover invalid routes, duplicate request IDs, exhausted budgets, lease recovery, cancellation and source partial failures. Record node durations, outcomes, version IDs and retry counts without raw protected text. Acceptance requires a trace showing all intended handoffs and a failure trace proving bounded recovery. Proposed module path is src/sandhata/agents/coordinator.py.
 
-## Family permission contract
+## User permission contract
 
-All inputs carry a server-resolved Principal; tools and service code enforce its tenant, owner, active membership and auth_version. Never accept a model-provided owner_id or administrator role as authority. Every read, write, cache, checkpoint and model context is scoped before execution. A model cannot switch family members, activate an account, grant roles or run housekeeping.
+All inputs carry a server-resolved Principal; tools and service code enforce its tenant, owner, active membership and auth_version. Never accept a model-provided owner_id or administrator role as authority. Every read, write, cache, checkpoint and model context is scoped before execution. A model cannot switch user members, activate an account, grant roles or run housekeeping.
 
-Only public provider payloads may be shared in cache. Resume evidence, imported descriptions, personal queries, tracker events and assessments remain private. Workers recheck membership before protected steps and stop on suspension. Missing scope fails closed. Administrator status does not grant access to another member's career content. Cross-user requests abstain or return a safe denial, even if a guessed record ID exists.
+Only public provider payloads may be shared in cache. Resume evidence, imported descriptions, personal queries, tracker events and assessments remain protected. Workers recheck membership before protected steps and stop on suspension. Missing scope fails closed. Administrator status does not grant access to another member's career content. Cross-user requests abstain or return a safe denial, even if a guessed record ID exists.
 
-Required verification includes member A requesting member B evidence, cache reuse, forged IDs/role instructions and a suspended user's queued run. Log opaque scope IDs and safe outcomes, never private prompt or resume text. Account management and cleanup belong to deterministic admin services, not this agent.
+Required verification includes member A requesting member B evidence, cache reuse, forged IDs/role instructions and a suspended user's queued run. Log opaque scope IDs and safe outcomes, never protected prompt or resume text. Account management and cleanup belong to deterministic admin services, not this agent.

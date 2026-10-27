@@ -1,4 +1,4 @@
-# Sandhātā GitHub and Collaboration Guide
+# SANDHĀTĀ GitHub and Collaboration Guide
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -6,14 +6,14 @@ This document specifies the intended implementation. Application code, test resu
 
 ## Repository destination
 
-The owner created https://github.com/hemach-git/sandhata and will run the network Git commands collaboratively. The local repository is C:/Users/Chepuri/Documents/ChatGPT/sandhata, a sibling of BRIHASPATI and an independent Git repository. Always verify the working directory and origin before staging or pushing. Never run git add from the finance repository for this work.
+The owner created https://github.com/hemach-git/sandhata and will run the network Git commands collaboratively. The local repository is C:/Users/Chepuri/Documents/ChatGPT/SANDHATA, a sibling of BRIHASPATI and an independent Git repository. Always verify the working directory and origin before staging or pushing. Never run git add from the finance repository for this work.
 
 ## Initial publication commands
 
 Open PowerShell and run these commands one at a time. The preparation step may already have created the local commit; git status will show whether there are changes. Authenticate through Git Credential Manager when prompted; do not paste tokens into chat.
 
 ```powershell
-Set-Location -LiteralPath 'C:\Users\Chepuri\Documents\ChatGPT\sandhata'
+Set-Location -LiteralPath 'C:\Users\Chepuri\Documents\ChatGPT\SANDHATA'
 git rev-parse --show-toplevel
 git status --short
 git remote -v
@@ -22,7 +22,7 @@ git ls-remote origin
 git push -u origin main
 ```
 
-The expected top-level path ends in sandhata and origin is https://github.com/hemach-git/sandhata.git. If authentication fails, resolve it in Git Credential Manager. If the repository is private, verify visibility in GitHub settings; do not make resume files public.
+The expected top-level path ends in sandhata and origin is https://github.com/hemach-git/sandhata.git. If authentication fails, resolve it in Git Credential Manager. If the repository is protected, verify visibility in GitHub settings; do not make resume files public.
 
 ## If the remote already has an initial commit
 
@@ -48,7 +48,7 @@ git commit -m "Implement core job comparison workflow"
 git push -u origin codex/core-workflow
 ```
 
-The example paths for implementation commits apply only once those directories exist. Review the staged content before every commit. Use a pull request for implementation changes and include behavior, validation and remaining limits. Avoid committing generated runtime logs, private resumes, database dumps, environment files and document QA render images.
+The example paths for implementation commits apply only once those directories exist. Review the staged content before every commit. Use a pull request for implementation changes and include behavior, validation and remaining limits. Avoid committing generated runtime logs, protected resumes, database dumps, environment files and document QA render images.
 
 ## Publication verification
 
@@ -58,6 +58,6 @@ After push, compare git rev-parse HEAD with git ls-remote origin refs/heads/main
 
 Pin dependencies, run tests/evals, review the diff and create a version tag only after acceptance. Suggested first implementation tag is v0.1.0; the design package is not an implemented application release. Keep CI deterministic with synthetic data; a separate optional job handles live provider checks without exposing secrets in logs.
 
-## Family baseline publication
+## User baseline publication
 
-Version 0.2 changes the target from personal-only to invite-only family use with administration. Publish the revised Markdown and Word documents, generator and manifest together. No family invitation token, OIDC secret, account export, database dump or real member evaluation fixture belongs in Git. The source repository remains https://github.com/hemach-git/sandhata and the local root remains C:/Users/Chepuri/Documents/ChatGPT/sandhata.
+Version 0.2 changes the target from personal-only to invite-only user use with administration. Publish the revised Markdown and Word documents, generator and manifest together. No user invitation token, OIDC secret, account export, database dump or real member evaluation fixture belongs in Git. The source repository remains https://github.com/hemach-git/sandhata and the local root remains C:/Users/Chepuri/Documents/ChatGPT/SANDHATA.

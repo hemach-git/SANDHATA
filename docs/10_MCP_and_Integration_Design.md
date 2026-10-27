@@ -1,4 +1,4 @@
-# Sandhātā MCP and Integration Design
+# SANDHĀTĀ MCP and Integration Design
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -20,7 +20,7 @@ MCP exposes controlled application capabilities to a compatible local client. It
 | Ladders | Browser search link and manual import | Automated access excluded from baseline |
 | Indeed | Browser search link and manual import | Approved integration access required for API expansion |
 
-Remotive requires attribution and backlinks. Its private paid API is separate from ordinary website access. For manual imports, record user_import provenance, original URL, pasted text and time. Email ingestion is deferred; an alert snippet is not a complete job description. Preserve the original portal link and an employer application URL separately when both are known.
+Remotive requires attribution and backlinks. Its protected paid API is separate from ordinary website access. For manual imports, record user_import provenance, original URL, pasted text and time. Email ingestion is deferred; an alert snippet is not a complete job description. Preserve the original portal link and an employer application URL separately when both are known.
 
 ## Connector contract
 
@@ -47,8 +47,8 @@ Contract tests prove schema validity, limit enforcement, missing-record handling
 
 ## Authenticated MCP scope
 
-The proposed local stdio adapter is bound at launch to a short-lived owner-authorized capability issued after application sign-in. It cannot choose a user by trusting an environment variable, caller-supplied owner_id or tool argument. Every call resolves the bound Principal, current membership and auth_version; missing or expired capability fails closed. Bootstrap secrets are not supplied on a command line or logged. If this binding is not implemented, disable MCP for the family release rather than exposing all local data.
+The proposed local stdio adapter is bound at launch to a short-lived owner-authorized capability issued after application sign-in. It cannot choose a user by trusting an environment variable, caller-supplied owner_id or tool argument. Every call resolves the bound Principal, current membership and auth_version; missing or expired capability fails closed. Bootstrap secrets are not supplied on a command line or logged. If this binding is not implemented, disable MCP for the user release rather than exposing all local data.
 
 The four read-only tools remain member-scoped. They cannot read other member records, account lists or administrative audit data. Administrative mutations are not exposed through MCP in v1. Remote shared MCP remains deferred until its independent OAuth authorization and transport controls are implemented and tested. Application OIDC cookies are not forwarded as general MCP bearer tokens.
 
-Each family member uses premium job portals in their own browser. Sandhātā stores neither portal passwords nor session cookies. Public Remotive refresh is one centrally cached operation for the deployment; ten users clicking Refresh cannot multiply its documented rate budget.
+Each user member uses premium job portals in their own browser. SANDHĀTĀ stores neither portal passwords nor session cookies. Public Remotive refresh is one centrally cached operation for the deployment; ten users clicking Refresh cannot multiply its documented rate budget.

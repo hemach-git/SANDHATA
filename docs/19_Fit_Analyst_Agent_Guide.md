@@ -1,4 +1,4 @@
-# Sandhātā Fit Analyst Agent Guide
+# SANDHĀTĀ Fit Analyst Agent Guide
 
 Version 0.2 | October 26 2026 | Prepared for Hema Chepuri | Design baseline
 
@@ -32,12 +32,12 @@ At most one structured-output repair is allowed. If output remains invalid, retu
 
 ## Verification and telemetry
 
-Test quote correctness, transferable skill limits, repeated requirements, absent categories, zero assessed weight, partial descriptions and fabricated credentials. Run the evaluation plan before model/prompt changes ship. Log version IDs, timing, token counts and validation outcomes; private rationale text remains in private application data rather than general logs. Proposed module path is src/sandhata/agents/fit.py.
+Test quote correctness, transferable skill limits, repeated requirements, absent categories, zero assessed weight, partial descriptions and fabricated credentials. Run the evaluation plan before model/prompt changes ship. Log version IDs, timing, token counts and validation outcomes; protected rationale text remains in protected application data rather than general logs. Proposed module path is src/sandhata/agents/fit.py.
 
-## Family permission contract
+## User permission contract
 
-All inputs carry a server-resolved Principal; tools and service code enforce its tenant, owner, active membership and auth_version. Never accept a model-provided owner_id or administrator role as authority. Every read, write, cache, checkpoint and model context is scoped before execution. A model cannot switch family members, activate an account, grant roles or run housekeeping.
+All inputs carry a server-resolved Principal; tools and service code enforce its tenant, owner, active membership and auth_version. Never accept a model-provided owner_id or administrator role as authority. Every read, write, cache, checkpoint and model context is scoped before execution. A model cannot switch user members, activate an account, grant roles or run housekeeping.
 
-Only public provider payloads may be shared in cache. Resume evidence, imported descriptions, personal queries, tracker events and assessments remain private. Workers recheck membership before protected steps and stop on suspension. Missing scope fails closed. Administrator status does not grant access to another member's career content. Cross-user requests abstain or return a safe denial, even if a guessed record ID exists.
+Only public provider payloads may be shared in cache. Resume evidence, imported descriptions, personal queries, tracker events and assessments remain protected. Workers recheck membership before protected steps and stop on suspension. Missing scope fails closed. Administrator status does not grant access to another member's career content. Cross-user requests abstain or return a safe denial, even if a guessed record ID exists.
 
-Required verification includes member A requesting member B evidence, cache reuse, forged IDs/role instructions and a suspended user's queued run. Log opaque scope IDs and safe outcomes, never private prompt or resume text. Account management and cleanup belong to deterministic admin services, not this agent.
+Required verification includes member A requesting member B evidence, cache reuse, forged IDs/role instructions and a suspended user's queued run. Log opaque scope IDs and safe outcomes, never protected prompt or resume text. Account management and cleanup belong to deterministic admin services, not this agent.

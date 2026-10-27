@@ -5,7 +5,9 @@ if (-not (Test-Path -LiteralPath $python)) { throw 'Create the Python 3.12 virtu
 Push-Location $project
 try {
     & $python scripts/bootstrap_local.py
-    docker compose up -d
+    docker compose up -d --wait postgres
+    if ($LASTEXITCODE -ne 0) { throw 'Database startup failed.' }
+    docker compose up -d keycloak
     if ($LASTEXITCODE -ne 0) { throw 'Container startup failed.' }
     & $python scripts/migrate.py
     if ($LASTEXITCODE -ne 0) { throw 'Migration failed. Wait for database readiness, then retry.' }
@@ -25,5 +27,5 @@ try {
         $process=Start-Process -FilePath $python -ArgumentList @('-m','sandhata.worker') -WorkingDirectory $project -WindowStyle Hidden -PassThru -RedirectStandardOutput 'runtime/worker.stdout.log' -RedirectStandardError 'runtime/worker.stderr.log'
         $process.Id | Set-Content -LiteralPath 'runtime/worker.pid'
     }
-    Write-Output 'Sandhata: http://localhost:18501 ; private access guide: runtime/LOCAL_ACCESS.md'
+    Write-Output 'SANDHATA: http://localhost:18501 ; access guide: runtime/LOCAL_ACCESS.md'
 } finally { Pop-Location }

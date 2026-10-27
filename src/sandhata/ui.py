@@ -13,6 +13,7 @@ from . import repository as repo
 from . import identity as auth
 from . import connectors
 from .worker import enqueue
+from .presentation import configure_visuals,landing,workspace_brand,display_name
 
 def safe_csv(records):
     frame=pd.DataFrame(records)
@@ -28,8 +29,8 @@ def private_download(p,label,kind,identifier='',params=''):
         cache=dict(token=auth.issue_capability(p),created=time.time());st.session_state['download_capability']=cache
     url=os.getenv('SANDHATA_API_BASE_URL','http://localhost:18502')+'/download/'+kind+('/'+str(identifier) if identifier else '')+params
     # Bearer token is in a private authenticated component, never in a URL, HTML attribute, or access log.
-    script='''<button id="download" style="font:14px sans-serif;padding:9px 14px;border:1px solid #ccd6df;border-radius:8px;background:white;color:#172B4D;cursor:pointer">LABEL</button><span id="message" style="font:12px sans-serif;margin-left:8px"></span>
-    <script>document.getElementById('download').onclick=async()=>{const m=document.getElementById('message');m.textContent='Authorizing…';try{const r=await fetch(URL,{headers:{Authorization:'Bearer '+TOKEN}});if(!r.ok)throw new Error('Access expired or file unavailable. Refresh this page.');const blob=await r.blob();const a=document.createElement('a');const u=URL_OBJECT.createObjectURL(blob);a.href=u;a.download=(r.headers.get('content-disposition')||'').split('filename="')[1]?.split('"')[0]||'sandhata-download';a.click();setTimeout(()=>URL_OBJECT.revokeObjectURL(u),1000);m.textContent='Downloaded';}catch(e){m.textContent=e.message;}};</script>'''
+    script='''<button id="download" style="font:14px sans-serif;padding:9px 14px;border:2px solid #F4C430;border-radius:8px;background:white;color:#164B99;cursor:pointer">LABEL</button><span id="message" style="font:12px sans-serif;margin-left:8px"></span>
+    <style>button:hover{background:#F4C430!important;color:#123263!important}button:focus-visible{outline:3px solid #164B99;outline-offset:2px}</style><script>document.getElementById('download').onclick=async()=>{const m=document.getElementById('message');m.textContent='Authorizing…';try{const r=await fetch(URL,{headers:{Authorization:'Bearer '+TOKEN}});if(!r.ok)throw new Error('Access expired or file unavailable. Refresh this page.');const blob=await r.blob();const a=document.createElement('a');const u=URL_OBJECT.createObjectURL(blob);a.href=u;a.download=(r.headers.get('content-disposition')||'').split('filename="')[1]?.split('"')[0]||'SANDHATA-download';a.click();setTimeout(()=>URL_OBJECT.revokeObjectURL(u),1000);m.textContent='Downloaded';}catch(e){m.textContent=e.message;}};</script>'''
     script=script.replace('LABEL',html.escape(label)).replace('URL_OBJECT','window.URL').replace('URL,',json.dumps(url)+',').replace('TOKEN',json.dumps(cache['token']))
     components.html(script,height=55)
 
@@ -156,7 +157,7 @@ def tracker(p,resumes,query):
         status=a.selectbox('Status',repo.STATUSES,index=repo.STATUSES.index(chosen['status']))
         event_date=b.date_input('Event date',value=datetime.now(ZoneInfo(p.timezone)).date(),max_value=datetime.now(ZoneInfo(p.timezone)).date())
         resume=st.selectbox('Resume used for this application',[None]+resumes,format_func=lambda r:'Keep existing / not recorded' if r is None else r['label'])
-        notes=st.text_area('Your private notes',value=chosen['notes'])
+        notes=st.text_area('Your notes',value=chosen['notes'])
         follow=st.date_input('Next follow-up',value=chosen['follow_up'])
         if st.form_submit_button('Save update',type='primary'):
             when=datetime.combine(event_date,datetime.min.time(),tzinfo=ZoneInfo(p.timezone)).astimezone(timezone.utc)
@@ -197,7 +198,7 @@ def diagnostics(p):
     if st.button('Refresh run status',type='primary'): st.rerun()
     heartbeat=DATA/'worker_heartbeat'
     if heartbeat.exists(): st.caption('Worker heartbeat: '+heartbeat.read_text(encoding='utf-8'))
-    else: st.warning('No worker heartbeat. Start python -m sandhata.worker using the project environment.')
+    else: st.warning('No worker heartbeat. Start the comparison worker using the project startup script.')
     for task in repo.tasks(p):
         with st.expander(f"{task['state'].title()} · {str(task['id'])[:12]} · {task['created_at']:%b %d %H:%M}"):
             if task['error_code']: st.warning(task['error_code']+' · Retry from Discover after checking the model and selected files.')
@@ -215,14 +216,14 @@ def diagnostics(p):
         for r in found:
             st.text(r['body']);st.caption(f"Citation: {r['parent_type']} {r['parent_id']} · passage {r['id']} · offset {r['start_offset']}")
     with st.expander('Local read-only MCP access'):
-        st.caption('Create a capability valid for 15 minutes. Store it privately; suspension and role changes revoke it. It grants only your own read-only data access.')
+        st.caption('Create a capability valid for 15 minutes. Store it securely; suspension and role changes revoke it. It grants only your own read-only data access.')
         if st.button('Create my MCP capability'):
-            st.code(auth.issue_capability(p));st.warning('Copy this privately. It will not be displayed again after leaving this page.')
+            st.code(auth.issue_capability(p));st.warning('Copy this securely. It will not be displayed again after leaving this page.')
 
 def admin_console(p):
     # Rechecks role in every service; the navigation check is only presentation.
     st.header('Administrator console')
-    st.caption('Manage family access and operations. Member resumes, private notes and job-search questions are excluded.')
+    st.caption('Manage user access, usage, system health and housekeeping.')
     tabs=st.tabs(['Users','Invitations','Usage and health','Audit','Housekeeping'])
     with tabs[0]:
         accounts=auth.list_accounts(p)
@@ -242,7 +243,7 @@ def admin_console(p):
             email=st.text_input('Exact verified identity-provider email')
             role=st.selectbox('Invited role',['member','admin'])
             if st.form_submit_button('Create 48-hour invitation',type='primary'):
-                st.code(auth.invite(p,email,role));st.info('Copy this code privately to the intended family member. No email has been sent.')
+                st.code(auth.invite(p,email,role));st.info('Copy this code securely to the intended user. No email has been sent.')
         invitations=auth.list_invitations(p)
         st.dataframe([{k:str(v) if isinstance(v,uuid.UUID) else v for k,v in row.items()} for row in invitations],use_container_width=True,hide_index=True)
         pending=[i for i in invitations if not i['revoked'] and not i['redeemed_at']]
@@ -254,14 +255,18 @@ def admin_console(p):
     with tabs[2]:
         metrics=auth.admin_metrics(p)
         a,b,c,d=st.columns(4)
-        a.metric('Family members',metrics['members']);b.metric('Active',metrics['active']);c.metric('Queued / running',metrics['queued']);d.metric('Failures · 24 h',metrics['failed'])
+        a.metric('Users',metrics['members']);b.metric('Active',metrics['active']);c.metric('Queued / running',metrics['queued']);d.metric('Failures · 24 h',metrics['failed'])
         st.dataframe(metrics['usage'],use_container_width=True,hide_index=True)
-        st.caption('Resource usage only; career outcomes remain private. Model: '+MODEL)
+        st.caption('Resource usage and system health. Model: '+MODEL)
         if metrics['public_cache_age_seconds'] is not None: st.caption(f"Public source cache age: {float(metrics['public_cache_age_seconds'])/3600:.1f} hours")
         heartbeat=DATA/'worker_heartbeat'
         if heartbeat.exists(): st.write('Worker heartbeat',heartbeat.read_text(encoding='utf-8'))
         report=ROOT/'runtime/last_backup.json'
-        if report.exists(): st.json(json.loads(report.read_text(encoding='utf-8')))
+        if report.exists():
+            backup=json.loads(report.read_text(encoding='utf-8'))
+            st.success('Backup and restore verification recorded')
+            st.caption('Last verified: '+backup.get('created_at','Not recorded'))
+            st.caption('Original files verified: '+str(backup.get('originals',0)))
         else: st.warning('No verified backup record. Use the operator backup script before shared deployment.')
     with tabs[3]:
         events=auth.audit_events(p)
@@ -287,29 +292,18 @@ def admin_console(p):
                 st.session_state.pop('maintenance_preview',None);st.success('Maintenance completed');st.json(result)
 
 def main():
-    st.set_page_config(page_title='Sandhātā · Career Intelligence',page_icon='↗',layout='wide')
-    st.markdown('''<style>
-    .stApp{background:#F5F7FA} h1,h2,h3{letter-spacing:-.025em}
-    [data-testid="stSidebar"]{background:#10243A}
-    [data-testid="stSidebar"] *{color:#E5EDF4}
-    [data-testid="stSidebar"] input{color:#172B4D}
-    [data-testid="stAppDeployButton"]{display:none}
-    [data-testid="stMetric"]{background:white;border:1px solid #E0E7EF;border-radius:14px;padding:18px}
-    .block-container{padding-top:2rem;max-width:1500px}
-    </style>''',unsafe_allow_html=True)
+    st.set_page_config(page_title='SANDHĀTĀ · Career Intelligence',page_icon='↗',layout='wide')
+    configure_visuals()
     if not getattr(st.user,'is_logged_in',False):
-        st.markdown('# Sandhātā')
-        st.markdown('### Your strengths. Your next opportunity.')
-        st.write('A private family workspace for discovering roles, comparing resume evidence, and tracking every next step.')
-        a,b,c=st.columns(3)
-        a.info('Discover jobs across public feeds and your premium sources.')
-        b.info('Compare the resume you choose against the original description.')
-        c.info('Track progress with private insights and clear next actions.')
         try: auth_ready='auth' in st.secrets and 'keycloak' in st.secrets['auth']
         except Exception: auth_ready=False
-        if not auth_ready: st.warning('Identity configuration required. Configure the OIDC provider in the private Streamlit secrets file before sign in.')
-        st.button('Sign in to your workspace',on_click=st.login,args=('keycloak',),type='primary',disabled=not auth_ready)
-        st.caption('Invite-only family access · Independent accounts · Private career records')
+        # The local identity provider serves the complete landing with its real form.
+        # Hosted providers retain their supported redirect flow.
+        if auth_ready and ISSUER == 'http://localhost:18180/realms/sandhata':
+            st.caption('Loading SANDHĀTĀ sign-in…')
+            st.login('keycloak')
+        else:
+            landing(auth_ready)
         return
     claims=dict(st.user)
     if claims.get('iss')!=ISSUER: st.error('Identity provider mismatch.');st.stop()
@@ -323,18 +317,18 @@ def main():
     try:
         p=resolve_identity(ISSUER,current)
         if p is None:
-            st.title('Family access required')
+            st.title('Workspace access required')
             st.info('This identity is not an active member. Redeem an invitation intended for your verified email, or contact your administrator.')
             with st.form('accept_invitation'):
                 token=st.text_input('Invitation code',type='password')
-                if st.form_submit_button('Join my family workspace',type='primary'): auth.accept_invitation(claims,token);st.rerun()
+                if st.form_submit_button('Join my workspace',type='primary'): auth.accept_invitation(claims,token);st.rerun()
             st.button('Sign out',on_click=st.logout);return
         if st.session_state.get('membership_version',p.auth_version)!=p.auth_version:
             st.session_state.clear();st.logout();st.stop()
         st.session_state['membership_version']=p.auth_version
         with st.sidebar:
-            st.markdown('## Sandhātā');st.caption('CAREER INTELLIGENCE')
-            st.write(p.display_name);st.caption('Administrator' if p.role=='admin' else 'Private member workspace')
+            st.markdown(workspace_brand(),unsafe_allow_html=True)
+            st.write(display_name(p.display_name));st.caption('Administrator' if p.role=='admin' else 'Member workspace')
             pages=['Discover','Resume Library','Tracker','Insights','Diagnostics']+(['Admin Console'] if p.role=='admin' else [])
             page=st.radio('Workspace',pages,label_visibility='collapsed')
             query=st.text_input('Search your workspace',placeholder='Role, company, skill or note')
@@ -350,6 +344,6 @@ def main():
         elif page=='Diagnostics': diagnostics(p)
         elif page=='Admin Console': admin_console(p)
     except AppError as exc: st.error(str(exc))
-    except SQLAlchemyError: st.error('The database operation could not complete. Your private data was not displayed. Check system health and retry.')
+    except SQLAlchemyError: st.error('The database operation could not complete. Your data was not displayed. Check system health and retry.')
 
 if __name__=='__main__': main()
