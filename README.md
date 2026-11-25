@@ -21,7 +21,7 @@ py -3.12 -m venv .venv
 powershell -ExecutionPolicy Bypass -File scripts/start_local.ps1
 ```
 
-On this machine the environment and services are already installed. Open http://localhost:18501 and use the protected `runtime/LOCAL_ACCESS.md` guide for pilot credentials. Never commit or share that file. All listener ports are loopback-only. Other devices cannot access this localhost deployment.
+On this machine the environment and services are already installed. Open http://localhost:8605 and use the protected `runtime/LOCAL_ACCESS.md` guide for pilot credentials. Never commit or share that file. All listener ports are loopback-only. Other devices cannot access this localhost deployment.
 
 ## Verify
 

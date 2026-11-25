@@ -13,8 +13,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Migration failed. Wait for database readiness, then retry.' }
     $env:PYTHONPATH = Join-Path $project 'src'
     $jobs = @(
-        @{name='web'; port=18501; args=@('-m','streamlit','run','app.py')},
-        @{name='private-api'; port=18502; args=@('-m','uvicorn','sandhata.private_api:app','--host','127.0.0.1','--port','18502')}
+        @{name='web'; port=8605; args=@('-m','streamlit','run','app.py')},
+        @{name='private-api'; port=8851; args=@('-m','uvicorn','sandhata.private_api:app','--host','127.0.0.1','--port','8851')}
     )
     foreach ($job in $jobs) {
         if (-not (Get-NetTCPConnection -LocalPort $job.port -State Listen -ErrorAction SilentlyContinue)) {
@@ -27,5 +27,5 @@ try {
         $process=Start-Process -FilePath $python -ArgumentList @('-m','sandhata.worker') -WorkingDirectory $project -WindowStyle Hidden -PassThru -RedirectStandardOutput 'runtime/worker.stdout.log' -RedirectStandardError 'runtime/worker.stderr.log'
         $process.Id | Set-Content -LiteralPath 'runtime/worker.pid'
     }
-    Write-Output 'SANDHATA: http://localhost:18501 ; access guide: runtime/LOCAL_ACCESS.md'
+    Write-Output 'SANDHATA: http://localhost:8605 ; access guide: runtime/LOCAL_ACCESS.md'
 } finally { Pop-Location }

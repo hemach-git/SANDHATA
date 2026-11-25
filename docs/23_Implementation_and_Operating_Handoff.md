@@ -23,7 +23,7 @@ SANDHĀTĀ now runs as a local application in its own repository outside BRIHASP
 
 ## Start and access
 
-The project root is C:/Users/Chepuri/Documents/ChatGPT/SANDHATA. The entry URL is http://localhost:18501 (the local identity provider displays the actual sign-in form within the landing layout), the protected download service at localhost:18502, PostgreSQL at 127.0.0.1:15432, and local Keycloak at localhost:18180. These ports are deliberately loopback-only. Existing CHAKRA and BRIHASPATI services are separate.
+The project root is C:/Users/Chepuri/Documents/ChatGPT/SANDHATA. The entry URL is http://localhost:8605 (the local identity provider displays the actual sign-in form within the landing layout), the protected download service at localhost:8851, PostgreSQL at 127.0.0.1:8853, and local Keycloak at localhost:18180. These ports are deliberately loopback-only. Existing CHAKRA and BRIHASPATI services are separate.
 
 Use scripts/start_local.ps1 to start the local services. It preserves existing settings. Credentials are only in runtime/LOCAL_ACCESS.md. The three generated local identities are admin, member-a and member-b. Use a separate browser profile for each user member. Sign out and close all SANDHĀTĀ tabs when handing the computer to someone else; downloaded files also remain on the shared computer. Each new sign-in explicitly requests identity-provider login instead of silently reusing the previous person's SSO identity. Only the administrator is initially an application member; an administrator creates an invitation for the exact verified identity email before a member redeems it after sign in. For actual relatives, provision individual identity-provider accounts, then invite them. Never share the administrator login.
 

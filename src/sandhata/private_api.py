@@ -41,4 +41,4 @@ async def download(request):
     except Exception: return JSONResponse({'error':'Download unavailable'},status_code=503)
 
 app=Starlette(routes=[Route('/health',health),Route('/download/{kind}',download),Route('/download/{kind}/{identifier}',download)])
-app.add_middleware(CORSMiddleware,allow_origins=[os.getenv('SANDHATA_APP_URL','http://localhost:18501')],allow_methods=['GET'],allow_headers=['Authorization'],expose_headers=['Content-Disposition'])
+app.add_middleware(CORSMiddleware,allow_origins=[os.getenv('SANDHATA_APP_URL','http://localhost:8605')],allow_methods=['GET'],allow_headers=['Authorization'],expose_headers=['Content-Disposition'])

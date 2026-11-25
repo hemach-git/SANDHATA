@@ -27,7 +27,7 @@ def private_download(p,label,kind,identifier='',params=''):
     cache=st.session_state.get('download_capability')
     if not cache or time.time()-cache['created']>840:
         cache=dict(token=auth.issue_capability(p),created=time.time());st.session_state['download_capability']=cache
-    url=os.getenv('SANDHATA_API_BASE_URL','http://localhost:18502')+'/download/'+kind+('/'+str(identifier) if identifier else '')+params
+    url=os.getenv('SANDHATA_API_BASE_URL','http://localhost:8851')+'/download/'+kind+('/'+str(identifier) if identifier else '')+params
     # Bearer token is in a private authenticated component, never in a URL, HTML attribute, or access log.
     script='''<button id="download" style="font:700 13px sans-serif;padding:7px 12px;border:2px solid #D8B65A;border-radius:8px;background:white;color:#164B99;cursor:pointer">LABEL</button><span id="message" style="font:12px sans-serif;margin-left:8px"></span>
     <style>button:hover{background:#F4C430!important;color:#123263!important}button:focus-visible{outline:3px solid #164B99;outline-offset:2px}</style><script>document.getElementById('download').onclick=async()=>{const m=document.getElementById('message');m.textContent='Authorizing…';try{const r=await fetch(URL,{headers:{Authorization:'Bearer '+TOKEN}});if(!r.ok)throw new Error('Access expired or file unavailable. Refresh this page.');const blob=await r.blob();const a=document.createElement('a');const u=URL_OBJECT.createObjectURL(blob);a.href=u;a.download=(r.headers.get('content-disposition')||'').split('filename="')[1]?.split('"')[0]||'SANDHATA-download';a.click();setTimeout(()=>URL_OBJECT.revokeObjectURL(u),1000);m.textContent='Downloaded';}catch(e){m.textContent=e.message;}};</script>'''

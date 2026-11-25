@@ -6,7 +6,7 @@ services:
       POSTGRES_DB: sandhata
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD:?Run bootstrap_local.py first}
-    ports: ["127.0.0.1:15432:5432"]
+    ports: ["127.0.0.1:8853:5432"]
     volumes:
       - pgdata:/var/lib/postgresql
       - ./runtime/init:/docker-entrypoint-initdb.d:ro

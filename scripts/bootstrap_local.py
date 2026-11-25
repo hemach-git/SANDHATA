@@ -26,8 +26,8 @@ realm = {
     'clients':[{'clientId':'sandhata-web','enabled':True,'protocol':'openid-connect',
                 'publicClient':False,'secret':clientsecret,'standardFlowEnabled':True,
                 'directAccessGrantsEnabled':False,
-                'redirectUris':['http://localhost:18501/oauth2callback'],
-                'webOrigins':['http://localhost:18501']}],
+                'redirectUris':['http://localhost:8605/oauth2callback'],
+                'webOrigins':['http://localhost:8605']}],
     'users':[{'id':p['id'],'username':p['username'],'firstName':p['display'], 'lastName':'Account',
               'email':p['email'],'emailVerified':True,'enabled':True,
               'credentials':[{'type':'password','value':p['password'],'temporary':False}]} for p in people]
@@ -40,23 +40,23 @@ realm = {
     'GRANT sandhata_app TO sandhata_worker;\n', encoding='utf-8')
 env = {
     'POSTGRES_ROOT_PASSWORD':rootpw,'KEYCLOAK_OPERATOR_PASSWORD':operatorpw,
-    'SANDHATA_DATABASE_URL':f'postgresql+psycopg://sandhata_app:{apppw}@127.0.0.1:15432/sandhata',
-    'SANDHATA_WORKER_DATABASE_URL':f'postgresql+psycopg://sandhata_worker:{workerpw}@127.0.0.1:15432/sandhata',
-    'SANDHATA_MIGRATION_URL':f'postgresql://postgres:{rootpw}@127.0.0.1:15432/sandhata',
+    'SANDHATA_DATABASE_URL':f'postgresql+psycopg://sandhata_app:{apppw}@127.0.0.1:8853/sandhata',
+    'SANDHATA_WORKER_DATABASE_URL':f'postgresql+psycopg://sandhata_worker:{workerpw}@127.0.0.1:8853/sandhata',
+    'SANDHATA_MIGRATION_URL':f'postgresql://postgres:{rootpw}@127.0.0.1:8853/sandhata',
     'SANDHATA_TENANT_ID':tenant,'SANDHATA_OIDC_ISSUER':'http://localhost:18180/realms/sandhata',
     'SANDHATA_MODEL_NAME':'gpt-oss:20b', 'SANDHATA_MODEL_BASE_URL':'http://127.0.0.1:11434',
-    'SANDHATA_APP_URL':'http://localhost:18501'
+    'SANDHATA_APP_URL':'http://localhost:8605'
 }
 (ROOT/'.env').write_text('\n'.join(f'{k}={v}' for k,v in env.items())+'\n',encoding='utf-8')
 (ROOT/'.streamlit').mkdir(exist_ok=True)
 (ROOT/'.streamlit/secrets.toml').write_text(
-    '[auth]\nredirect_uri = "http://localhost:18501/oauth2callback"\n'
+    '[auth]\nredirect_uri = "http://localhost:8605/oauth2callback"\n'
     f'cookie_secret = "{secret()}"\n\n[auth.keycloak]\nclient_id = "sandhata-web"\n'
     f'client_secret = "{clientsecret}"\nserver_metadata_url = "{env["SANDHATA_OIDC_ISSUER"]}/.well-known/openid-configuration"\n'
     'client_kwargs = {scope = "openid profile email", prompt = "login", max_age = 28800}\n',encoding='utf-8')
 guide=['# SANDHATA localhost access','',
        'This file contains generated credentials. Do not commit, share publicly, or paste into chat.',
-       '', 'Application: http://localhost:18501', 'Identity console: http://localhost:18180/admin',
+       '', 'Application: http://localhost:8605', 'Identity console: http://localhost:18180/admin',
        '', f'Identity operator: operator / {operatorpw}', '',
        'These identities are for the localhost pilot. Member identities must still accept an app invitation.', '']
 for p in people: guide.append(f"- {p['display']}: `{p['username']}` / `{p['password']}`; email `{p['email']}`")
