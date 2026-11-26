@@ -19,7 +19,7 @@ def main():
     keypath=ROOT/'runtime/backup.key'
     if not keypath.exists(): keypath.write_bytes(AESGCM.generate_key(bit_length=256))
     key=keypath.read_bytes()
-    tables=['profiles','jobs','job_versions','resumes','passages','applications','status_events','assessments','tasks','capabilities','memberships','invitations','admin_audit','deletion_tombstones','maintenance_receipts']
+    tables=['profiles','jobs','job_versions','resumes','passages','applications','status_events','assessments','tasks','capabilities','memberships','invitations','admin_audit','deletion_tombstones','maintenance_receipts','watchlists']
     with psycopg.connect(os.environ['SANDHATA_MIGRATION_URL']) as c:
         # Lock before exporting a snapshot: upload/delete/worker changes wait until all referenced files are copied.
         c.execute(sql.SQL('LOCK TABLE {} IN SHARE MODE').format(sql.SQL(',').join(map(sql.Identifier,tables))))

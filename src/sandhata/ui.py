@@ -12,7 +12,9 @@ from .db import resolve_identity,transaction,rows,one,scoped
 from . import repository as repo
 from . import identity as auth
 from . import connectors
-from .worker import enqueue
+from .worker import enqueue,enqueue_batch
+from .targeting import TARGET_FILTERS,SUGGESTED_BOARDS,priority
+from .agenda import build_agenda,follow_up_calendar
 from .presentation import configure_visuals,landing,workspace_brand,display_name,compact_chart
 
 def safe_csv(records):
@@ -53,22 +55,91 @@ def result_view(result):
             st.write('**Selected resume evidence**');st.text(r['resume_quote'] or 'Not evidenced in this resume.')
             st.write(r['rationale']);st.caption(f"Category: {r['category']} · Job offset {r['job_offset']} · Resume offset {r['resume_offset']}")
 
+def today_page(p,selected_resume):
+    st.header('Today')
+    st.caption('Follow-ups, quiet applications and new matches from your saved records.')
+    now=datetime.now(ZoneInfo(p.timezone)).date()
+    applications=repo.list_applications(p)
+    plan=build_agenda(applications,now)
+    jobs=repo.list_jobs(p)
+    new=[j for j in jobs if j['is_new']]
+    a,b,c,d=st.columns(4)
+    a.metric('Overdue follow-ups',len(plan['overdue']));b.metric('Due in 7 days',len(plan['upcoming']))
+    c.metric('Quiet 14+ days',len(plan['stale']));d.metric('New matches',len(new))
+    columns=['title','company','status','follow_up','recruiter','notes']
+    for key,label in [('overdue','Overdue'),('upcoming','Coming up'),('stale','No recent update and no follow-up date')]:
+        if plan[key]:
+            st.subheader(label)
+            compact_dataframe(pd.DataFrame(plan[key])[columns],hide_index=True,use_container_width=True)
+    if not any(plan.values()): st.info('Nothing is due. Add follow-up dates in Tracker to see them here.')
+    dated=[x for x in plan['overdue']+plan['upcoming']]
+    if dated: st.download_button('Add these follow-ups to my calendar (.ics)',follow_up_calendar(dated,datetime.now(timezone.utc)),'SANDHATA_FOLLOW_UPS.ics','text/calendar')
+    if selected_resume:
+        fit=repo.fit_by_version(p,selected_resume)
+        tracked={str(x['job_id']) for x in applications}
+        ranked=[(fit[str(j['version_id'])],j) for j in jobs if str(j['id']) not in tracked and fit.get(str(j['version_id']),{}).get('score') is not None]
+        if ranked:
+            st.subheader('Strongest compared roles not yet tracked')
+            ranked.sort(key=lambda pair:(not pair[0]['provisional'],pair[0]['score'],pair[0]['coverage']),reverse=True)
+            compact_dataframe(pd.DataFrame([dict(alignment=r['score'],coverage=r['coverage'],provisional=r['provisional'],title=j['title'],company=j['company'],location=j['location'],posting=j['original_url']) for r,j in ranked[:10]]),
+                hide_index=True,use_container_width=True,column_config={'posting':st.column_config.LinkColumn('posting')})
+    if new:
+        st.subheader('Newest matches')
+        top=sorted(new,key=priority,reverse=True)[:10]
+        compact_dataframe(pd.DataFrame([dict(title=j['title'],company=j['company'],location=j['location'],posting=j['original_url']) for j in top]),
+            hide_index=True,use_container_width=True,column_config={'posting':st.column_config.LinkColumn('posting')})
+        st.caption('Open Discover to compare these roles and mark them reviewed.')
+
+def target_choice(profiles,key):
+    labels=['Senior AI and Forward Deployed roles (default)']+[x['label']+' · '+str(x['id'])[:6] for x in profiles]
+    choice=st.selectbox('Match using',labels,key=key)
+    return TARGET_FILTERS if choice==labels[0] else profiles[labels.index(choice)-1]['filters']
+
+def watchlist(p,profiles):
+    with st.expander('Target companies · scan employer boards',expanded=True):
+        watched=repo.list_watchlist(p)
+        if st.button('Add suggested AI employers'):
+            for provider,board,company in SUGGESTED_BOARDS: repo.add_watch(p,provider,board,company)
+            st.rerun()
+        with st.form('add_watch',clear_on_submit=True):
+            a,b,c=st.columns(3)
+            provider=a.selectbox('Board provider',connectors.PROVIDERS)
+            board=b.text_input('Board token')
+            company=c.text_input('Company display name')
+            if st.form_submit_button('Add to my companies'):
+                connectors.check_board(provider,board);repo.add_watch(p,provider,board,company);st.rerun()
+        if not watched:
+            st.info('Add employers once, then scan them all for matching roles.');return
+        compact_dataframe(pd.DataFrame(watched)[['company','provider','board','last_checked','last_note']],hide_index=True,use_container_width=True)
+        a,b=st.columns([3,1])
+        remove=a.selectbox('Company to remove',watched,format_func=lambda w:w['company']+' · '+w['provider'])
+        if b.button('Remove company'): repo.remove_watch(p,remove['id']);st.rerun()
+        filters=target_choice(profiles,'scan_filters')
+        per_board=st.slider('Maximum roles saved per company',5,50,25)
+        if st.button('Scan all companies',type='primary'):
+            with st.spinner('Reading each employer board. This can take a minute or two…'):
+                st.session_state['scan_results']=connectors.scan_watchlist(p,filters,per_board)
+            st.rerun()
+        for r in st.session_state.get('scan_results',[]):
+            (st.success if r['ok'] else st.warning)(r['company']+': '+r['note'])
+        st.caption('Scans run when you click. Roles are filtered across the whole board before the per-company limit applies.')
+
 def discover(p,resumes,selected_resume,query):
     st.header('Discover your next opportunity')
     st.caption('Automatic public feeds. Assisted premium searches. Every job and comparison stays in your workspace.')
     profiles=repo.list_profiles(p)
     with st.expander('Search preferences',expanded=True):
-        loaded={}
+        loaded=TARGET_FILTERS
         if profiles:
             choice=st.selectbox('Saved search', ['New search']+[x['label']+' · '+str(x['id'])[:6] for x in profiles])
             if choice!='New search': loaded=profiles[[x['label']+' · '+str(x['id'])[:6] for x in profiles].index(choice)]['filters']
         with st.form('search_preferences'):
             a,b=st.columns(2)
-            title=a.text_input('Job titles separated by commas',value=loaded.get('title',''))
+            title=a.text_input('Job titles separated by commas',value=loaded.get('title',''),help='All words of one title must appear, in any order.')
             company=b.text_input('Company',value=loaded.get('company',''))
             a,b=st.columns(2)
             skills=a.text_input('Required skills separated by commas',value=loaded.get('required_skills',''))
-            location=b.text_input('Location or remote region',value=loaded.get('location',''))
+            location=b.text_input('Locations separated by semicolons',value=loaded.get('location',''),help='Whole words only. US remote means remote roles open to the United States.')
             a,b=st.columns(2)
             salary=a.number_input('Minimum disclosed USD annual salary',min_value=0,value=int(loaded.get('minimum_salary',0)),step=10000)
             exclude=b.text_input('Exclude words',value=loaded.get('exclude',''))
@@ -86,8 +157,9 @@ def discover(p,resumes,selected_resume,query):
             if outcome['stale']: st.warning('Source unavailable; used a labeled cached snapshot.')
         st.caption('Remotive public feed is delayed 24 hours. One deployment-wide refresh every six hours. Location/skill filters use posted text; validate restrictions in the original description.')
         cols=st.columns(3)
-        for col,(label_,url) in zip(cols,connectors.premium_search_links(title,location).items()): col.link_button('Search '+label_,url,use_container_width=True)
+        for col,(label_,url) in zip(cols,connectors.premium_search_links(title.split(',')[0].strip(),location.split(';')[0].strip()).items()): col.link_button('Search '+label_,url,use_container_width=True)
         st.caption('Premium portals open in your own browser session. Import the posting below; no account cookies or passwords are collected.')
+    watchlist(p,profiles)
     with st.expander('Import a premium posting or a job you found'):
         with st.form('manual_import',clear_on_submit=True):
             a,b=st.columns(2)
@@ -104,17 +176,43 @@ def discover(p,resumes,selected_resume,query):
         with st.form('employer'):
             provider=st.selectbox('Public employer feed',['Greenhouse','Lever','Ashby'])
             board=st.text_input('Employer board token',placeholder='Use the token from the employer’s hosted careers page')
+            only=st.checkbox('Only roles matching the senior AI target filters',value=True)
             if st.form_submit_button('Import up to 50 employer postings'):
-                with st.spinner('Loading the public employer feed…'): count=connectors.employer_feed(p,provider,board)
-                st.success(f'{count} employer postings saved.');st.rerun()
+                with st.spinner('Loading the public employer feed…'): outcome=connectors.employer_feed(p,provider,board,TARGET_FILTERS if only else None)
+                st.success(f"{outcome['matched']} of {outcome['total']} postings matched; {outcome['count']} saved.")
     jobs=repo.list_jobs(p,query)
     st.subheader(str(len(jobs))+' saved '+('opportunity' if len(jobs)==1 else 'opportunities'))
     if not jobs:
         st.info('Run a public search or import your first posting. Your saved jobs will appear here.');return
     private_download(p,'Export your jobs as CSV','jobs')
-    for j in jobs[:50]:
+    fit=repo.fit_by_version(p,selected_resume) if selected_resume else {}
+    a,b,c=st.columns(3)
+    order=a.selectbox('Sort by',['Role priority','Resume alignment','Newest saved'])
+    new_only=b.checkbox(f"New only ({sum(j['is_new'] for j in jobs)})")
+    if new_only: jobs=[j for j in jobs if j['is_new']]
+    # jobs arrive newest first; sorting is stable, so ties keep that order.
+    if order=='Role priority': jobs=sorted(jobs,key=priority,reverse=True)
+    if order=='Resume alignment':
+        jobs=sorted(jobs,key=lambda j:(fit.get(str(j['version_id']),{}).get('score') is not None,fit.get(str(j['version_id']),{}).get('score') or 0),reverse=True)
+        if not selected_resume: st.info('Choose a resume in the sidebar to sort by alignment.')
+    pages=max(1,(len(jobs)+24)//25)
+    number=c.number_input(f'Page of {pages}',1,pages,1)
+    shown=jobs[(number-1)*25:number*25]
+    a,b,c=st.columns(3)
+    batch=a.number_input('Roles to compare',1,25,5)
+    if b.button('Compare next unscored roles',disabled=not selected_resume,use_container_width=True):
+        outcome=enqueue_batch(p,jobs,selected_resume,batch)
+        st.success(f"{outcome['queued']} comparisons queued in the order shown. Each runs on your local model; follow progress in Diagnostics.")
+        if outcome['stopped']: st.warning(outcome['stopped'])
+    if c.button('Mark this page reviewed',disabled=not any(j['is_new'] for j in shown),use_container_width=True):
+        repo.mark_reviewed(p,[j['id'] for j in shown]);st.rerun()
+    if not shown: st.info('No roles match this view.')
+    for j in shown:
         with st.container(border=True):
             st.markdown(f"### {html.escape(j['title'])}")
+            score=fit.get(str(j['version_id']))
+            badges=(['New'] if j['is_new'] else [])+([f"Resume alignment {score['score']:.0f}%"+(' (provisional)' if score['provisional'] else '')] if score and score['score'] is not None else [])
+            if badges: st.markdown('**'+' · '.join(badges)+'**')
             st.write(f"**{j['company']}** · {j['location'] or 'Location not disclosed'} · {j['salary'] or 'Salary not disclosed'}")
             st.caption(f"Source: {j['source']} · Description: {j['completeness']} · Last checked: {j['last_checked']:%b %d %Y}")
             a,b,c=st.columns(3)
@@ -457,7 +555,7 @@ def main():
         with st.sidebar:
             st.markdown(workspace_brand(),unsafe_allow_html=True)
             st.write(display_name(p.display_name));st.caption('Administrator' if p.role=='admin' else 'Member workspace')
-            pages=['Discover','Resume Library','Tracker','Insights','Diagnostics']+(['Admin Console'] if p.role=='admin' else [])
+            pages=['Today','Discover','Resume Library','Tracker','Insights','Diagnostics']+(['Admin Console'] if p.role=='admin' else [])
             page=st.radio('Workspace',pages,label_visibility='collapsed')
             query=st.text_input('Search your workspace',placeholder='Role, company, skill or note')
             resumes=repo.list_resumes(p)
@@ -465,7 +563,8 @@ def main():
             st.caption('Search · Analyze · Navigate · Discover · Highlight · Apply · Track · Advance')
             st.button('Sign out',on_click=st.logout)
         selected=resume['id'] if resume else None
-        if page=='Discover': discover(p,resumes,selected,query)
+        if page=='Today': today_page(p,selected)
+        elif page=='Discover': discover(p,resumes,selected,query)
         elif page=='Resume Library': resume_library(p,query)
         elif page=='Tracker': tracker(p,resumes,query)
         elif page=='Insights': insights(p)

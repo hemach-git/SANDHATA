@@ -63,7 +63,7 @@ BEGIN
    UPDATE memberships SET state='deletion_pending',auth_version=auth_version+1 WHERE tenant_id=t AND user_id=target_user;
    SELECT coalesce(jsonb_agg(object_key),'[]') INTO keys FROM resumes WHERE tenant_id=t AND owner_user_id=target_user;
    INSERT INTO deletion_tombstones(tenant_id,owner_user_id,object_id,object_type) SELECT t,target_user,id,'resume' FROM resumes WHERE tenant_id=t AND owner_user_id=target_user ON CONFLICT DO NOTHING;
-   FOREACH tbl IN ARRAY ARRAY['capabilities','tasks','assessments','status_events','applications','passages','resumes','job_versions','jobs','profiles'] LOOP
+   FOREACH tbl IN ARRAY ARRAY['capabilities','tasks','assessments','status_events','applications','passages','resumes','job_versions','jobs','profiles','watchlists'] LOOP
      EXECUTE format('DELETE FROM %I WHERE tenant_id=$1 AND owner_user_id=$2',tbl) USING t,target_user;
    END LOOP;
  END IF;

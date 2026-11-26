@@ -17,7 +17,7 @@ def index_text(c,p,parent_id,parent_type,body):
     for offset,chunk in passages(body):
         c.exec_driver_sql('INSERT INTO passages(tenant_id,owner_user_id,parent_id,parent_type,start_offset,body) VALUES(%(t)s::uuid,%(u)s::uuid,%(id)s::uuid,%(kind)s,%(o)s,%(body)s)',scoped(p,id=str(parent_id),kind=parent_type,o=offset,body=chunk))
 
-def import_job(p,title,company,description,source='Manual import',url='',location='',salary='',source_key=None,complete=True,workplace=''):
+def import_job(p,title,company,description,source='Manual import',url='',location='',salary='',source_key=None,complete=True,workplace='',flag_new=False):
     title,company=title.strip(),company.strip()
     if not title or not company or len(title)>300 or len(company)>200: raise AppError('Job title and company are required and must fit the field limits.')
     if len(description)>150000 or len(description.strip())<40: raise AppError('Paste a description between 40 and 150,000 characters.')
@@ -28,14 +28,42 @@ def import_job(p,title,company,description,source='Manual import',url='',locatio
     content_hash=hashlib.sha256(body.encode()).hexdigest()
     key=str(source_key or url or hashlib.sha256((title+'|'+company+'|'+location).encode()).hexdigest())
     with transaction(p) as c:
-        j=one(c,'INSERT INTO jobs(tenant_id,owner_user_id,title,company,location,salary,source,original_url,source_key,workplace) VALUES(%(t)s::uuid,%(u)s::uuid,%(title)s,%(company)s,%(location)s,%(salary)s,%(source)s,%(url)s,%(key)s,%(workplace)s) ON CONFLICT(tenant_id,owner_user_id,source,source_key) DO UPDATE SET last_checked=now(),title=EXCLUDED.title,company=EXCLUDED.company,location=EXCLUDED.location,salary=EXCLUDED.salary RETURNING id',scoped(p,title=title,company=company,location=location[:400],salary=salary[:400],source=source[:100],url=url,key=key,workplace=workplace))
+        j=one(c,'INSERT INTO jobs(tenant_id,owner_user_id,title,company,location,salary,source,original_url,source_key,workplace,is_new) VALUES(%(t)s::uuid,%(u)s::uuid,%(title)s,%(company)s,%(location)s,%(salary)s,%(source)s,%(url)s,%(key)s,%(workplace)s,%(new)s) ON CONFLICT(tenant_id,owner_user_id,source,source_key) DO UPDATE SET last_checked=now(),title=EXCLUDED.title,company=EXCLUDED.company,location=CASE WHEN EXCLUDED.location=\'\' OR EXISTS(SELECT 1 FROM applications a WHERE a.job_id=jobs.id) THEN jobs.location ELSE EXCLUDED.location END,salary=CASE WHEN EXCLUDED.salary=\'\' OR EXISTS(SELECT 1 FROM applications a WHERE a.job_id=jobs.id) THEN jobs.salary ELSE EXCLUDED.salary END RETURNING id',scoped(p,new=flag_new,title=title,company=company,location=location[:400],salary=salary[:400],source=source[:100],url=url,key=key,workplace=workplace))
         v=one(c,'INSERT INTO job_versions(tenant_id,owner_user_id,job_id,body,raw_html,content_hash,completeness) VALUES(%(t)s::uuid,%(u)s::uuid,%(job)s::uuid,%(body)s,%(raw)s,%(hash)s,%(comp)s) ON CONFLICT(tenant_id,owner_user_id,job_id,content_hash) DO NOTHING RETURNING id',scoped(p,job=str(j['id']),body=body,raw=description,hash=content_hash,comp='full' if complete else 'partial'))
         if v: index_text(c,p,v['id'],'job',body)
         return str(j['id'])
 
-def list_jobs(p,query='',limit=100):
+def list_jobs(p,query='',limit=1000):
     with transaction(p) as c:
-        return rows(c,"SELECT j.*,v.id version_id,v.body,v.completeness FROM jobs j JOIN LATERAL (SELECT id,body,completeness FROM job_versions WHERE job_id=j.id ORDER BY created_at DESC LIMIT 1) v ON true WHERE (%(q)s='' OR to_tsvector('simple',j.title||' '||j.company||' '||j.location||' '||v.body) @@ plainto_tsquery('simple',%(q)s)) ORDER BY j.created_at DESC LIMIT %(n)s",dict(q=query[:200],n=min(int(limit),200)))
+        return rows(c,"SELECT j.*,v.id version_id,v.body,v.completeness FROM jobs j JOIN LATERAL (SELECT id,body,completeness FROM job_versions WHERE job_id=j.id ORDER BY created_at DESC LIMIT 1) v ON true WHERE (%(q)s='' OR to_tsvector('simple',j.title||' '||j.company||' '||j.location||' '||v.body) @@ plainto_tsquery('simple',%(q)s)) ORDER BY j.created_at DESC LIMIT %(n)s",dict(q=query[:200],n=min(int(limit),1000)))
+
+def job_count(p):
+    with transaction(p) as c: return one(c,'SELECT count(*) n FROM jobs')['n']
+
+def mark_reviewed(p,job_ids):
+    if not job_ids: return
+    with transaction(p) as c: c.exec_driver_sql('UPDATE jobs SET is_new=false WHERE id=ANY(%(ids)s::uuid[])',dict(ids=[str(i) for i in job_ids]))
+
+def add_watch(p,provider,board,company=''):
+    company=company.strip() or board
+    if len(company)>200: raise AppError('Company name must be at most 200 characters.')
+    with transaction(p) as c:
+        c.exec_driver_sql('INSERT INTO watchlists(tenant_id,owner_user_id,provider,board,company) VALUES(%(t)s::uuid,%(u)s::uuid,%(provider)s,%(board)s,%(company)s) ON CONFLICT(tenant_id,owner_user_id,provider,board) DO UPDATE SET company=EXCLUDED.company',scoped(p,provider=provider,board=board,company=company))
+
+def list_watchlist(p):
+    with transaction(p) as c: return rows(c,'SELECT id,provider,board,company,last_checked,last_note FROM watchlists ORDER BY lower(company),provider')
+
+def remove_watch(p,watch_id):
+    with transaction(p) as c: c.exec_driver_sql('DELETE FROM watchlists WHERE id=%(id)s::uuid',dict(id=str(watch_id)))
+
+def record_scan(p,watch_id,note):
+    with transaction(p) as c: c.exec_driver_sql('UPDATE watchlists SET last_checked=now(),last_note=%(note)s WHERE id=%(id)s::uuid',dict(note=note[:400],id=str(watch_id)))
+
+def fit_by_version(p,resume_id):
+    """Latest assessment per job description version for one resume."""
+    with transaction(p) as c:
+        found=rows(c,'SELECT DISTINCT ON (job_version_id) job_version_id,result FROM assessments WHERE resume_id=%(r)s::uuid ORDER BY job_version_id,created_at DESC',dict(r=str(resume_id)))
+    return {str(x['job_version_id']):x['result'] for x in found}
 
 def job_detail(p,job_id,version_id=None):
     with transaction(p) as c:

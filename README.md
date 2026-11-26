@@ -38,6 +38,16 @@ The live evaluation command uses synthetic text with your local model. Backups a
 
 Remotive public API uses a deployment-wide six-hour cache. Greenhouse, Lever and Ashby adapters take known employer boards. LinkedIn, Indeed and Ladders open searches in the user's own browser and support full-description manual import. Premium subscriptions do not imply API rights. Employer adapter breadth is implemented but not live-certified for every employer.
 
+## Daily job search
+
+**Today** lists overdue and upcoming follow-ups, applications with no update for 14 days and no follow-up date, new matches, and the strongest compared roles for the selected resume. Follow-ups download as a calendar file without notes.
+
+In Discover, **Target companies** keeps a personal list of Greenhouse, Lever and Ashby boards. Scans run when clicked, filter each whole board before the per-company limit, flag new roles, and continue past a failed board. The default filters target Forward Deployed and AI roles in Charlotte, North Carolina or remote in the United States. Locations are separated by semicolons and matched as whole words. Refreshing a posting keeps the location and salary of tracked applications.
+
+**Compare next unscored roles** queues a batch in the displayed order, subject to the daily quota. Role priority is an ordering aid, not a fit score.
+
+Comparisons accept up to 48,000 combined characters with the default `SANDHATA_MODEL_CONTEXT=32768`; a smaller context lowers the limit. After upgrading, apply the schema with `scripts/migrate.py --schema-only` (the start script also applies it) and restart the web and worker processes. Greenhouse postings imported earlier may contain HTML tags; scan or import that board again.
+
 ## Deployment and GitHub
 
 Current operation is local to this home computer, with individual user logins. Use a separate browser profile per person and sign out when switching users. AWS is a future deployment target; the CHAKRA AWS account/profile is excluded. See [the AWS deployment guide](docs/24_AWS_Deployment_Guide.md) and `deploy/aws/foundation.json` for the isolated infrastructure foundation. Read-only STS and CloudFormation template validation passed; no AWS infrastructure has been created. A future separate AWS setup, domain and budget will be supplied when deployment resumes.

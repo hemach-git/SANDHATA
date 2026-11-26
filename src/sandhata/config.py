@@ -15,6 +15,9 @@ WORKER_DATABASE_URL = os.getenv('SANDHATA_WORKER_DATABASE_URL', DATABASE_URL)
 MODEL_URL = os.getenv('SANDHATA_MODEL_BASE_URL', 'http://127.0.0.1:11434')
 MODEL = os.getenv('SANDHATA_MODEL_NAME', 'gpt-oss:20b')
 TIMEZONE = 'America/New_York'
+MODEL_CONTEXT = int(os.getenv('SANDHATA_MODEL_CONTEXT', '32768'))
+# Combined description and resume characters (about four per token), leaving room for the 6,000 token reply.
+DOCUMENT_LIMIT = min(48000, max(0, MODEL_CONTEXT - 8000) * 3)
 
 class AppError(Exception):
     """A safe error message suitable for the UI; never includes raw provider errors."""

@@ -1,19 +1,22 @@
 """Explicit public source adapters. Premium portal URLs are never scraped."""
-import re,json
+import re,json,html
 from urllib.parse import quote,urlencode
 from datetime import datetime,timezone
 import httpx
 from .config import AppError
 from .db import transaction,one
-from .repository import import_job
-from .parsing import salary_yearly
+from .repository import import_job,job_count,list_watchlist,record_scan
+from .parsing import plain_html
+from .targeting import matches_filters,priority
 
-def fetch_json(url,params=None):
+PROVIDERS=('Greenhouse','Lever','Ashby')
+
+def fetch_json(url,params=None,limit_mb=15):
     try:
         with httpx.Client(timeout=20,follow_redirects=False,headers={'User-Agent':'SANDHATA career workspace'}) as client:
             r=client.get(url,params=params)
             r.raise_for_status()
-            if len(r.content)>15*1024*1024: raise AppError('Source response exceeds the supported size.')
+            if len(r.content)>limit_mb*1024*1024: raise AppError('Source response exceeds the supported size.')
             return r.json()
     except AppError: raise
     except Exception as exc: raise AppError('Source unavailable. Existing saved jobs remain available; try again later.') from exc
@@ -32,47 +35,85 @@ def remotive(p):
         c.exec_driver_sql("INSERT INTO public_cache(key,data) VALUES('remotive',%(data)s::jsonb) ON CONFLICT(key) DO UPDATE SET data=EXCLUDED.data,updated_at=now()",dict(data=json.dumps(data)))
         return data,datetime.now(timezone.utc),False
 
-def matches_filters(job,filters):
-    title=job.get('title','').lower(); company=job.get('company_name',job.get('company','')).lower()
-    body=(title+' '+company+' '+job.get('description','')).lower()
-    location=job.get('candidate_required_location',job.get('location','')).lower()
-    if filters.get('title') and not any(t.strip().lower() in title for t in filters['title'].split(',') if t.strip()): return False
-    if filters.get('company') and filters['company'].lower() not in company: return False
-    required=[s.strip().lower() for s in filters.get('required_skills','').split(',') if s.strip()]
-    if required and not all(s in body for s in required): return False
-    if any(s.strip().lower() in body for s in filters.get('exclude','').split(',') if s.strip()): return False
-    if filters.get('location') and filters['location'].lower() not in location and location not in ('worldwide','anywhere'): return False
-    pay=salary_yearly(job.get('salary',''))
-    if filters.get('minimum_salary') and (pay is None or pay[1]<float(filters['minimum_salary'])):
-        return bool(pay is None and filters.get('include_unknown_salary',True))
-    return True
-
 def search_remotive(p,filters):
     data,checked,stale=remotive(p)
-    found=[j for j in data if matches_filters(j,filters)][:50]
+    # Every Remotive role is remote, so its region list is matched as a remote location.
+    found=[j for j in data if matches_filters(dict(j,candidate_required_location='Remote - '+j.get('candidate_required_location','')),filters)]
+    found=sorted(found,key=lambda j:priority(j,filters),reverse=True)[:50]
     for j in found:
         import_job(p,j['title'],j['company_name'],j['description'],'Remotive',j['url'],
                    j.get('candidate_required_location',''),j.get('salary',''),str(j['id']),True,'Remote')
     return dict(count=len(found),checked=checked,stale=stale,source='Remotive',feed_delay='24 hours')
 
-def employer_feed(p,provider,board):
+def check_board(provider,board):
+    if provider not in PROVIDERS: raise AppError('Unsupported employer provider.')
     if not re.fullmatch(r'[A-Za-z0-9_-]{1,100}',board): raise AppError('Enter only the employer board token, without a URL.')
-    token=quote(board,safe='')
+    return quote(board,safe='')
+
+def with_remote(location,remote):
+    if remote and 'remote' not in location.lower(): return (location+' (Remote)').strip()
+    return location
+
+def ashby_remote(job):
+    # Ashby also sets isRemote on hybrid roles, so the workplace type wins when present.
+    if job.get('workplaceType'): return job['workplaceType']=='Remote'
+    return bool(job.get('isRemote'))
+
+def parse_board(provider,board,payload):
+    '''Normalize one public feed. Descriptions stay HTML; import_job removes the markup.'''
     if provider=='Greenhouse':
-        jobs=fetch_json(f'https://boards-api.greenhouse.io/v1/boards/{token}/jobs',{'content':'true'})['jobs']
-        parsed=[dict(title=j['title'],company=board,description=j.get('content',''),url=j['absolute_url'],location=j.get('location',{}).get('name',''),key=str(j['id'])) for j in jobs]
-    elif provider=='Lever':
-        jobs=fetch_json(f'https://api.lever.co/v0/postings/{token}',{'mode':'json'})
-        parsed=[dict(title=j['text'],company=board,description=j.get('description','')+'\n'+''.join('<h3>'+s['text']+'</h3>'+s['content'] for s in j.get('lists',[]))+'\n'+j.get('additional',''),url=j['hostedUrl'],location=j.get('categories',{}).get('location',''),key=j['id']) for j in jobs]
-    elif provider=='Ashby':
-        jobs=fetch_json(f'https://api.ashbyhq.com/posting-api/job-board/{token}',{'includeCompensation':'true'})['jobs']
-        parsed=[dict(title=j['title'],company=board,description=j.get('descriptionHtml',j.get('descriptionPlain','')),url=j['jobUrl'],location=j.get('location',''),key=j.get('id',j['jobUrl'])) for j in jobs if j.get('isListed',True)]
-    else: raise AppError('Unsupported employer provider.')
-    count=0
-    for j in parsed[:50]:
-        if len(j['description'])<40: continue
-        import_job(p,j['title'],j['company'],j['description'],provider,j['url'],j['location'],source_key=j['key']); count+=1
-    return count
+        # Greenhouse sends entity-escaped HTML, which must be unescaped before tags can be removed.
+        return [dict(title=j['title'],company=board,description=html.unescape(j.get('content') or ''),url=j['absolute_url'],
+                     location=(j.get('location') or {}).get('name') or '',salary='',key=str(j['id'])) for j in payload['jobs']]
+    if provider=='Lever':
+        return [dict(title=j['text'],company=board,
+                     description=(j.get('description') or '')+'\n'+''.join('<h3>'+x['text']+'</h3>'+x['content'] for x in j.get('lists') or [])+'\n'+(j.get('additional') or ''),
+                     url=j['hostedUrl'],location=with_remote((j.get('categories') or {}).get('location') or '',j.get('workplaceType')=='remote'),
+                     salary='',key=j['id']) for j in payload]
+    return [dict(title=j['title'],company=board,description=j.get('descriptionHtml') or j.get('descriptionPlain') or '',url=j['jobUrl'],
+                 location=with_remote(j.get('location') or '',ashby_remote(j)),
+                 salary=(j.get('compensation') or {}).get('compensationTierSummary') or '',key=j.get('id') or j['jobUrl'])
+            for j in payload['jobs'] if j.get('isListed',True)]
+
+def fetch_board(provider,board):
+    token=check_board(provider,board)
+    url,params={
+        'Greenhouse':(f'https://boards-api.greenhouse.io/v1/boards/{token}/jobs',{'content':'true'}),
+        'Lever':(f'https://api.lever.co/v0/postings/{token}',{'mode':'json'}),
+        'Ashby':(f'https://api.ashbyhq.com/posting-api/job-board/{token}',{'includeCompensation':'true'}),
+    }[provider]
+    payload=fetch_json(url,params,limit_mb=40)
+    try: return parse_board(provider,board,payload)
+    except (KeyError,TypeError,AttributeError) as exc: raise AppError('The employer feed format was not recognized.') from exc
+
+def employer_feed(p,provider,board,filters=None,limit=50,company=None):
+    '''Filter the whole board first, then save the highest-priority matches.'''
+    postings=fetch_board(provider,board)
+    matched=[]
+    for j in postings:
+        text=plain_html(j['description'])
+        if len(text)<40 or len(j['description'])>150000 or not j['url'].startswith('https://') or not j['title'].strip(): continue
+        if filters and not matches_filters(dict(j,description=text),filters): continue
+        matched.append(j)
+    matched.sort(key=lambda j:priority(j,filters),reverse=True)
+    saved=matched[:limit]
+    before=job_count(p) if saved else 0
+    for j in saved:
+        import_job(p,j['title'][:300],company or j['company'],j['description'],provider,j['url'],j['location'],j['salary'],source_key=j['key'],flag_new=True)
+    return dict(total=len(postings),matched=len(matched),count=len(saved),new=job_count(p)-before if saved else 0)
+
+def scan_watchlist(p,filters,per_board=25):
+    '''One board failing never stops the others.'''
+    results=[]
+    for w in list_watchlist(p):
+        try:
+            outcome=employer_feed(p,w['provider'],w['board'],filters,per_board,w['company'])
+            note=f"{outcome['matched']} matched of {outcome['total']}; saved {outcome['count']}; {outcome['new']} new"
+            results.append(dict(company=w['company'],ok=True,note=note,**outcome))
+        except AppError as exc:
+            note=str(exc); results.append(dict(company=w['company'],ok=False,note=note))
+        record_scan(p,w['id'],note)
+    return results
 
 def premium_search_links(title,location):
     return {

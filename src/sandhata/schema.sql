@@ -36,6 +36,13 @@ CREATE TABLE IF NOT EXISTS jobs (
  UNIQUE(tenant_id,owner_user_id,id), UNIQUE(tenant_id,owner_user_id,source,source_key)
 );
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS job_type text NOT NULL DEFAULT '';
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS is_new boolean NOT NULL DEFAULT false;
+CREATE TABLE IF NOT EXISTS watchlists (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL, owner_user_id uuid NOT NULL,
+ provider text NOT NULL CHECK(provider IN ('Greenhouse','Lever','Ashby')), board text NOT NULL, company text NOT NULL,
+ last_checked timestamptz, last_note text NOT NULL DEFAULT '', created_at timestamptz NOT NULL DEFAULT now(),
+ UNIQUE(tenant_id,owner_user_id,provider,board)
+);
 CREATE TABLE IF NOT EXISTS job_versions (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL, owner_user_id uuid NOT NULL, job_id uuid NOT NULL,
  body text NOT NULL, raw_html text NOT NULL, content_hash text NOT NULL, completeness text NOT NULL,
@@ -135,7 +142,7 @@ BEGIN
 END $$;
 
 DO $$ DECLARE tbl text; BEGIN
- FOREACH tbl IN ARRAY ARRAY['profiles','jobs','job_versions','resumes','passages','applications','status_events','assessments','tasks','capabilities'] LOOP
+ FOREACH tbl IN ARRAY ARRAY['profiles','jobs','job_versions','resumes','passages','applications','status_events','assessments','tasks','capabilities','watchlists'] LOOP
  EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY',tbl);
  EXECUTE format('ALTER TABLE %I FORCE ROW LEVEL SECURITY',tbl);
  EXECUTE format('DROP POLICY IF EXISTS owned ON %I',tbl);
