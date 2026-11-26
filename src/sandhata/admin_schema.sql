@@ -74,3 +74,19 @@ BEGIN
 END $$;
 REVOKE ALL ON FUNCTION appsec.admin_metrics(),appsec.housekeeping(text,uuid,boolean,integer,text,text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION appsec.admin_metrics(),appsec.housekeeping(text,uuid,boolean,integer,text,text) TO sandhata_app;
+
+CREATE OR REPLACE FUNCTION appsec.delete_tracker(target uuid,why text)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,pg_temp AS $$
+DECLARE t uuid; owner_id uuid;
+BEGIN
+ IF NOT appsec.is_admin() THEN RAISE EXCEPTION 'admin_required'; END IF;
+ IF length(trim(why))<5 THEN RAISE EXCEPTION 'reason_required'; END IF;
+ t:=current_setting('app.tenant_id')::uuid;
+ SELECT owner_user_id INTO owner_id FROM applications WHERE id=target AND tenant_id=t FOR UPDATE;
+ IF NOT FOUND THEN RAISE EXCEPTION 'tracker_unavailable'; END IF;
+ DELETE FROM status_events WHERE tenant_id=t AND application_id=target;
+ DELETE FROM applications WHERE tenant_id=t AND id=target;
+ INSERT INTO admin_audit(tenant_id,actor_id,action,target,reason) VALUES(t,current_setting('app.user_id')::uuid,'delete_tracker',target::text,left(why,300));
+END $$;
+REVOKE ALL ON FUNCTION appsec.delete_tracker(uuid,text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION appsec.delete_tracker(uuid,text) TO sandhata_app;

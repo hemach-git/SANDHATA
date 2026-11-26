@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS jobs (
  created_at timestamptz NOT NULL DEFAULT now(), last_checked timestamptz NOT NULL DEFAULT now(),
  UNIQUE(tenant_id,owner_user_id,id), UNIQUE(tenant_id,owner_user_id,source,source_key)
 );
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS job_type text NOT NULL DEFAULT '';
 CREATE TABLE IF NOT EXISTS job_versions (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL, owner_user_id uuid NOT NULL, job_id uuid NOT NULL,
  body text NOT NULL, raw_html text NOT NULL, content_hash text NOT NULL, completeness text NOT NULL,
@@ -63,6 +64,7 @@ CREATE TABLE IF NOT EXISTS applications (
  FOREIGN KEY(tenant_id,owner_user_id,job_id) REFERENCES jobs(tenant_id,owner_user_id,id),
  FOREIGN KEY(tenant_id,owner_user_id,resume_id) REFERENCES resumes(tenant_id,owner_user_id,id)
 );
+ALTER TABLE applications ADD COLUMN IF NOT EXISTS recruiter text NOT NULL DEFAULT '';
 CREATE TABLE IF NOT EXISTS status_events (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL, owner_user_id uuid NOT NULL,
  application_id uuid NOT NULL, status text NOT NULL, occurred_at timestamptz NOT NULL, recorded_at timestamptz NOT NULL DEFAULT now(), request_id text NOT NULL,

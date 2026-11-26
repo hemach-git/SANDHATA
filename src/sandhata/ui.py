@@ -21,6 +21,9 @@ def safe_csv(records):
         frame[col]=frame[col].map(lambda v:"'"+v if isinstance(v,str) and v.lstrip().startswith(('=','+','-','@')) else v)
     return frame.to_csv(index=False).encode('utf-8-sig')
 
+def compact_dataframe(data,**kwargs):
+    return st.dataframe(data,height=min(320,max(100,38+32*len(data))),**kwargs)
+
 def toast(message): st.toast(message)
 
 def private_download(p,label,kind,identifier='',params=''):
@@ -145,27 +148,144 @@ def resume_library(p,query):
             confirm=st.checkbox('Delete this version and its comparison evidence',key='deleteconfirm_'+str(r['id']))
             if st.button('Delete resume',key='delete_'+str(r['id']),disabled=not confirm): repo.delete_resume(p,r['id']);st.rerun()
 
+def reset_tracker_draft(prefix):
+    """Discard browser draft widget values only; never call storage APIs."""
+    for key in list(st.session_state):
+        if key.startswith(prefix): del st.session_state[key]
+
+def reset_application_form(prefix,app_id):
+    reset_tracker_draft(prefix)
+    version_key='tracker_form_version_'+app_id
+    st.session_state[version_key]=st.session_state.get(version_key,0)+1
+    st.session_state['tracker_feedback_'+app_id]='Unsaved changes discarded. The form now shows the stored application. Saved history was not changed.'
+
+def new_application(p):
+    from .tracker_import import WORK_ARRANGEMENTS,JOB_TYPES
+    prefix='tracker_new_'
+    if st.session_state.pop('tracker_clear_new',False): reset_tracker_draft(prefix)
+    message=st.session_state.pop('tracker_new_success',None)
+    if message: st.success(message)
+    with st.expander('New application · enter manually',expanded=False):
+        st.caption('Paste the LinkedIn posting link and enter the role and employer. Start with Saved for a new lead; choose Applied only after submitting. Reset draft clears these fields without changing saved trackers or history.')
+        with st.form('new_application'):
+            a,b=st.columns(2)
+            title=a.text_input('Job title *',max_chars=300,key=prefix+'title')
+            company=b.text_input('Employer *',max_chars=200,key=prefix+'company')
+            url=st.text_input('Posting URL (optional)',placeholder='https://www.linkedin.com/jobs/view/...',key=prefix+'url')
+            a,b=st.columns(2)
+            location=a.text_input('Location',max_chars=400,key=prefix+'location',placeholder='Charlotte, NC or Remote')
+            arrangement=b.selectbox('Work arrangement',WORK_ARRANGEMENTS,format_func=lambda value:value or 'Not specified',key=prefix+'arrangement')
+            a,b=st.columns(2)
+            salary_description=a.text_input('Salary Description',max_chars=400,key=prefix+'salary',placeholder='$150k-$180k base + bonus, or $95/hour W2')
+            job_type=b.selectbox('Job Type',JOB_TYPES,format_func=lambda value:value or 'Not specified',key=prefix+'job_type')
+            a,b,c=st.columns(3)
+            recruiter=c.text_input('Recruiter',key=prefix+'recruiter',max_chars=400,placeholder='Name or agency')
+            source=a.selectbox('Source',['LinkedIn','Recruiter','Employer career page','Referral','Other'],key=prefix+'source')
+            status=b.selectbox('Initial status',repo.STATUSES,key=prefix+'status')
+            a,b=st.columns(2)
+            applied=a.date_input('Application submitted on (optional)',value=None,max_value=datetime.now(ZoneInfo(p.timezone)).date(),key=prefix+'applied',help='Leave blank if not submitted or the date is unknown.')
+            follow=b.date_input('Next follow-up (optional)',value=None,key=prefix+'follow')
+            a,b=st.columns(2)
+            description=a.text_area('Posting description (optional)',height=110,max_chars=150000,key=prefix+'description')
+            notes=b.text_area('Notes / recruiter message',height=110,max_chars=10000,key=prefix+'notes')
+            a,b=st.columns(2)
+            save=a.form_submit_button('Save new application',type='primary')
+            b.form_submit_button('Reset draft',on_click=reset_tracker_draft,args=(prefix,))
+        if save:
+            try:
+                when=datetime.combine(applied,datetime.min.time(),tzinfo=ZoneInfo(p.timezone)) if applied else None
+                result=repo.create_manual_application(p,title,company,status,url,location,arrangement,notes,description,when,follow,source,salary_description=salary_description,job_type=job_type,recruiter=recruiter)
+                if result['added']:
+                    st.session_state['tracker_clear_new']=True
+                    st.session_state['tracker_new_success']='Application saved. The new-entry form is ready for another role. Clear search or status filters if the new item is hidden.'
+                    st.rerun()
+                else: st.warning('This application is already tracked. Existing data and history were preserved. Find it below to update it, or reset this draft.')
+            except AppError as exc: st.error(str(exc))
+
 def tracker(p,resumes,query):
     st.header('Application tracker')
     st.caption('Opening a posting never marks it applied. Record submissions and event dates explicitly.')
-    items=repo.list_applications(p,query)
-    if not items: st.info('Save a job from Discover to begin tracking.');return
+    search_col,clear_col=st.columns([4,1])
+    tracker_query=search_col.text_input('Search applications',key='tracker_search',placeholder='Recruiter, company, city, or role',help='Case-insensitive partial matches. Combine words, such as Anthony Charlotte. Also searches notes. Sidebar search and status filters still apply.')
+    def clear_tracker_filters():
+        st.session_state['tracker_search']=''
+        st.session_state['tracker_status_filter']=[]
+    clear_col.button('Clear search / filters',on_click=clear_tracker_filters)
+    new_application(p)
+    from .tracker_import import TEMPLATE,parse_tracker
+    with st.expander('Upload Tracker · one row or bulk CSV'):
+        st.caption('Required: title, company. Optional columns are in the template. Dates: YYYY-MM-DD; timestamps may include a timezone (otherwise UTC). Existing uploaded postings are skipped without overwriting edits. Records have no automatic expiry and persist until an administrator deletes them, including through account erasure. Keep database backups for recovery.')
+        st.download_button('Download upload template',TEMPLATE,'SANDHATA_TRACKER_TEMPLATE.csv','text/csv')
+        upload=st.file_uploader('Upload Tracker',type=['csv'],key='tracker_upload')
+        if upload is not None:
+            data=upload.getvalue()
+            try:
+                preview=parse_tracker(data,repo.STATUSES)
+                st.write(f'{len(preview)} validated rows')
+                compact_dataframe(pd.DataFrame(preview),hide_index=True,use_container_width=True)
+                if st.button('Import validated trackers',type='primary'):
+                    result=repo.import_tracker(p,data)
+                    st.success(f"Imported {result['added']} trackers; skipped {result['skipped']} duplicates.")
+            except AppError as exc: st.error(str(exc))
     private_download(p,'Export your tracker','tracker')
-    st.dataframe(pd.DataFrame(items)[['title','company','status','applied_at','follow_up','notes']],use_container_width=True,hide_index=True)
+    items=repo.list_applications(p,' '.join(filter(None,[query,tracker_query])))
+    statuses=st.multiselect('Filter by status',repo.STATUSES,key='tracker_status_filter')
+    if statuses: items=[item for item in items if item['status'] in statuses]
+    st.caption(f'{len(items)} trackers match your search and filters.')
+    if not items: st.info('No matching applications. Clear tracker search / filters or the sidebar search to see more, or add a new application.');return
+    compact_dataframe(pd.DataFrame(items)[['title','company','location','work_arrangement','salary_description','job_type','recruiter','status','applied_at','follow_up','notes']],use_container_width=True,hide_index=True)
     chosen=st.selectbox('Update an application',items,format_func=lambda a:f"{a['title']} · {a['company']}")
     rid=str(chosen['id'])
-    with st.form('tracker_'+rid):
+    detail=repo.job_detail(p,chosen['job_id'])
+    with st.expander('Posting details'):
+        st.write(detail['title']+' · '+detail['company'])
+        if detail['original_url']: st.link_button('Open original posting',detail['original_url'])
+        st.write('Salary Description: '+(detail.get('salary') or 'Not specified'))
+        st.write('Job Type: '+(detail.get('job_type') or 'Not specified'))
+        st.write('Recruiter: '+(chosen.get('recruiter') or 'Not specified'))
+        st.text(detail['body'])
+    edit_prefix='tracker_edit_'+rid+'_'
+    feedback=st.session_state.pop('tracker_feedback_'+rid,None)
+    if feedback: st.info(feedback)
+    st.caption('Save update edits this application. Status history gets a new row only when Status changes. Reset unsaved changes reloads stored values without deleting anything.')
+    with st.form('tracker_'+rid+'_'+str(st.session_state.get('tracker_form_version_'+rid,0))):
         a,b=st.columns(2)
-        status=a.selectbox('Status',repo.STATUSES,index=repo.STATUSES.index(chosen['status']))
-        event_date=b.date_input('Event date',value=datetime.now(ZoneInfo(p.timezone)).date(),max_value=datetime.now(ZoneInfo(p.timezone)).date())
-        resume=st.selectbox('Resume used for this application',[None]+resumes,format_func=lambda r:'Keep existing / not recorded' if r is None else r['label'])
-        notes=st.text_area('Your notes',value=chosen['notes'])
-        follow=st.date_input('Next follow-up',value=chosen['follow_up'])
-        if st.form_submit_button('Save update',type='primary'):
+        status=a.selectbox('Status',repo.STATUSES,index=repo.STATUSES.index(chosen['status']),key=edit_prefix+'status')
+        event_date=b.date_input('Event date',key=edit_prefix+'event',value=datetime.now(ZoneInfo(p.timezone)).date(),max_value=datetime.now(ZoneInfo(p.timezone)).date())
+        a,b=st.columns(2)
+        resume=a.selectbox('Resume used for this application',[None]+resumes,key=edit_prefix+'resume',format_func=lambda r:'Keep existing / not recorded' if r is None else r['label'])
+        recruiter=b.text_input('Recruiter',value=chosen.get('recruiter',''),key=edit_prefix+'recruiter',max_chars=400)
+        a,b=st.columns(2)
+        location=a.text_input('Location',value=chosen['location'],key=edit_prefix+'location',max_chars=400,placeholder='Charlotte, NC or Remote')
+        from .tracker_import import WORK_ARRANGEMENTS,work_arrangement as normalize_arrangement
+        try: current_arrangement=normalize_arrangement(chosen['work_arrangement'])
+        except ValueError: current_arrangement=''
+        arrangement=b.selectbox('Work arrangement',WORK_ARRANGEMENTS,index=WORK_ARRANGEMENTS.index(current_arrangement),key=edit_prefix+'arrangement',format_func=lambda value:value or 'Not specified')
+        from .tracker_import import JOB_TYPES
+        a,b=st.columns(2)
+        salary_description=a.text_input('Salary Description',value=chosen.get('salary_description',''),key=edit_prefix+'salary',max_chars=400)
+        stored_type=chosen.get('job_type','')
+        job_type=b.selectbox('Job Type',JOB_TYPES,index=JOB_TYPES.index(stored_type) if stored_type in JOB_TYPES else 0,key=edit_prefix+'job_type',format_func=lambda value:value or 'Not specified')
+        a,b=st.columns([2,1])
+        notes=a.text_area('Your notes',height=110,value=chosen['notes'],key=edit_prefix+'notes')
+        follow=b.date_input('Next follow-up',value=chosen['follow_up'],key=edit_prefix+'follow')
+        a,b=st.columns(2)
+        save_update=a.form_submit_button('Save update',type='primary')
+        b.form_submit_button('Reset unsaved changes',on_click=reset_application_form,args=(edit_prefix,rid))
+        if save_update:
             when=datetime.combine(event_date,datetime.min.time(),tzinfo=ZoneInfo(p.timezone)).astimezone(timezone.utc)
-            repo.update_application(p,chosen['id'],status,notes,when,str(uuid.uuid4()),resume['id'] if resume else None,follow);toast('Tracker updated');st.rerun()
+            result=repo.update_application(p,chosen['id'],status,notes,when,str(uuid.uuid4()),resume['id'] if resume else None,follow,location=location,work_arrangement=arrangement,salary_description=salary_description,job_type=job_type,recruiter=recruiter)
+            st.session_state['tracker_feedback_'+rid]={'unchanged':'No changes to save. No records or history rows were added.','details_updated':'Application details saved. Status history was unchanged.','status_changed':'Application saved and status change recorded once.'}[result]
+            st.rerun()
     st.subheader('Status history')
-    st.dataframe(repo.application_history(p,chosen['id']),use_container_width=True,hide_index=True)
+    st.caption('Each row is a recorded status event for this application, not a duplicate application. Earlier history is preserved.')
+    compact_dataframe(repo.application_history(p,chosen['id']),use_container_width=True,hide_index=True)
+    if p.role=='admin':
+        with st.expander('Administrator · permanently delete this tracker'):
+            reason=st.text_input('Deletion reason',key='tracker_delete_reason_'+rid)
+            confirmed=st.checkbox('Permanently delete this tracker and its status history',key='tracker_delete_confirm_'+rid)
+            if st.button('Delete tracker',disabled=not confirmed,key='tracker_delete_'+rid):
+                repo.delete_tracker(p,rid,reason);toast('Tracker deleted');st.rerun()
 
 def insights(p):
     st.header('Your search insights')
@@ -182,17 +302,21 @@ def insights(p):
         a.plotly_chart(compact_chart(px.pie(pd.DataFrame(metrics['current']),names='status',values='n',hole=.65,title='Current pipeline · all saved applications')),use_container_width=True,theme=None)
     if metrics['weekly']:
         b.plotly_chart(compact_chart(px.line(pd.DataFrame(metrics['weekly']).assign(week=lambda d:pd.to_datetime(d['week']).dt.strftime('%b %d, %Y')),x='week',y='applications',markers=True,title='Weekly applications')),use_container_width=True,theme=None)
+    progression_col,gap_col=st.columns(2) if n and metrics['gaps'] else (st.container(),st.container())
     if n:
-        st.plotly_chart(compact_chart(px.funnel(pd.DataFrame({'Stage':['Applied','Interview','Offer'],'Applications':[n,interview,offer]}),x='Applications',y='Stage',title='Observed cohort progression'),rows=3),use_container_width=True,theme=None)
+        with st.expander('Application report details'):
+            compact_dataframe(pd.DataFrame(cohort)[['title','company','location','work_arrangement','salary_description','job_type','recruiter','applied_at']],hide_index=True,use_container_width=True)
+        progression_col.plotly_chart(compact_chart(px.funnel(pd.DataFrame({'Stage':['Applied','Interview','Offer'],'Applications':[n,interview,offer]}),x='Applications',y='Stage',title='Observed cohort progression'),rows=3),use_container_width=True,theme=None)
         frame=pd.DataFrame(cohort)
         st.subheader('Source and resume outcomes')
-        st.table(frame.groupby('source').agg(applications=('id','count'),interviews=('interview','sum'),offers=('offer','sum')).reset_index())
+        a,b=st.columns(2)
+        a.table(frame.groupby('source').agg(applications=('id','count'),interviews=('interview','sum'),offers=('offer','sum')).reset_index())
         frame['resume_label']=frame['resume_label'].fillna('Not recorded')
-        st.table(frame.groupby('resume_label').agg(applications=('id','count'),interviews=('interview','sum'),offers=('offer','sum')).reset_index())
+        b.table(frame.groupby('resume_label').agg(applications=('id','count'),interviews=('interview','sum'),offers=('offer','sum')).reset_index())
         private_download(p,'Export applied cohort','cohort',params=f'?start={start.isoformat()}&end={end.isoformat()}')
     if metrics['gaps']:
         gaps=pd.DataFrame(metrics['gaps'],columns=['Requirement not evidenced','Count'])
-        st.plotly_chart(compact_chart(px.bar(gaps,x='Count',y='Requirement not evidenced',orientation='h',title='Frequently not evidenced requirements'),rows=len(gaps)),use_container_width=True,theme=None)
+        gap_col.plotly_chart(compact_chart(px.bar(gaps,x='Count',y='Requirement not evidenced',orientation='h',title='Frequently not evidenced requirements'),rows=len(gaps)),use_container_width=True,theme=None)
     if not n and not metrics['current']: st.info('Your charts will populate from saved jobs and recorded application events.')
 
 def diagnostics(p):
@@ -229,7 +353,7 @@ def admin_console(p):
     tabs=st.tabs(['Users','Invitations','Usage and health','Audit','Housekeeping'])
     with tabs[0]:
         accounts=auth.list_accounts(p)
-        st.dataframe([{k:str(v) if isinstance(v,uuid.UUID) else v for k,v in row.items()} for row in accounts],use_container_width=True,hide_index=True)
+        compact_dataframe([{k:str(v) if isinstance(v,uuid.UUID) else v for k,v in row.items()} for row in accounts],use_container_width=True,hide_index=True)
         chosen=st.selectbox('Manage account',accounts,format_func=lambda u:u['display_name']+' · '+u['email'])
         with st.form('account_edit'):
             a,b,c=st.columns(3)
@@ -242,12 +366,13 @@ def admin_console(p):
         st.caption('At least one active administrator must remain. Passwords and MFA are managed by the identity provider, not this application.')
     with tabs[1]:
         with st.form('invite'):
-            email=st.text_input('Exact verified identity-provider email')
-            role=st.selectbox('Invited role',['member','admin'])
+            a,b=st.columns(2)
+            email=a.text_input('Exact verified identity-provider email')
+            role=b.selectbox('Invited role',['member','admin'])
             if st.form_submit_button('Create 48-hour invitation',type='primary'):
                 st.code(auth.invite(p,email,role));st.info('Copy this code securely to the intended user. No email has been sent.')
         invitations=auth.list_invitations(p)
-        st.dataframe([{k:str(v) if isinstance(v,uuid.UUID) else v for k,v in row.items()} for row in invitations],use_container_width=True,hide_index=True)
+        compact_dataframe([{k:str(v) if isinstance(v,uuid.UUID) else v for k,v in row.items()} for row in invitations],use_container_width=True,hide_index=True)
         pending=[i for i in invitations if not i['revoked'] and not i['redeemed_at']]
         if pending:
             revoke=st.selectbox('Invitation to revoke',pending,format_func=lambda i:i['email_hint']+' · '+str(i['id'])[:8])
@@ -258,7 +383,7 @@ def admin_console(p):
         metrics=auth.admin_metrics(p)
         a,b,c,d=st.columns(4)
         a.metric('Users',metrics['members']);b.metric('Active',metrics['active']);c.metric('Queued / running',metrics['queued']);d.metric('Failures · 24 h',metrics['failed'])
-        st.dataframe(metrics['usage'],use_container_width=True,hide_index=True)
+        compact_dataframe(metrics['usage'],use_container_width=True,hide_index=True)
         st.caption('Resource usage and system health. Model: '+MODEL)
         if metrics['public_cache_age_seconds'] is not None: st.caption(f"Public source cache age: {float(metrics['public_cache_age_seconds'])/3600:.1f} hours")
         heartbeat=DATA/'worker_heartbeat'
@@ -272,7 +397,7 @@ def admin_console(p):
         else: st.warning('No verified backup record. Use the operator backup script before shared deployment.')
     with tabs[3]:
         events=auth.audit_events(p)
-        st.dataframe(events,use_container_width=True,hide_index=True)
+        compact_dataframe(events,use_container_width=True,hide_index=True)
         private_download(p,'Export safe audit metadata','audit')
     with tabs[4]:
         kind=st.selectbox('Maintenance job',['expired_invitations','old_tasks','cancel_revoked_tasks','erase_account'])
@@ -307,6 +432,7 @@ def main():
         else:
             landing(auth_ready)
         return
+    st.html('<span class="sn-workspace-marker" aria-hidden="true"></span>')
     claims=dict(st.user)
     if claims.get('iss')!=ISSUER: st.error('Identity provider mismatch.');st.stop()
     current=claims.get('sub','')

@@ -104,3 +104,48 @@ button[kind="primary"],button[kind="primaryFormSubmit"]{background:#164B99!impor
 .stApp summary,.stApp summary:hover{background:var(--sn-white)!important;color:var(--sn-ink)!important}.stApp input:not([type="checkbox"]):not([type="radio"]){color:var(--sn-ink)!important;background:var(--sn-white)!important}.stApp input::placeholder,.stApp textarea::placeholder{color:var(--sn-muted)!important;opacity:1}.stApp button svg{color:var(--sn-blue)}body:has(.sn-theme-dark) [data-testid="stSelectbox"] button{background:var(--sn-white)!important;color:var(--sn-ink)!important}
 body:has(.sn-theme-dark) [data-testid="stDateInput"] button,body:has(.sn-theme-dark) [data-testid="stDateInput"]>div>div{background:var(--sn-white)!important;color:var(--sn-ink)!important}
 [data-testid="stTable"]{border:1.5px solid var(--sn-border);border-radius:8px;overflow:auto}[data-testid="stTable"] th,[data-testid="stTable"] td{background:var(--sn-white)!important;color:var(--sn-ink)!important;font-weight:700!important;border:1px solid var(--sn-border)!important;padding:5px 8px!important}
+
+/* Select menus are portalled outside .stApp; theme the options and their text explicitly. */
+[data-baseweb="popover"] [role="listbox"],[data-baseweb="popover"] [data-baseweb="menu"]{background:var(--sn-white)!important;color:var(--sn-ink)!important}
+[role="listbox"] [role="option"],[role="listbox"] [role="option"] *{color:var(--sn-ink)!important}
+[role="listbox"] [role="option"]{background:var(--sn-white)!important}
+[role="listbox"] [role="option"]:hover,[role="listbox"] [role="option"]:focus,[role="listbox"] [role="option"][aria-selected="true"]{background:var(--sn-gold-tint)!important;color:var(--sn-ink)!important}
+
+/* Tooltip and toast portals must use the active palette, including nested text. */
+[role="tooltip"],[role="tooltip"] *,[data-baseweb="tooltip"],[data-baseweb="tooltip"] *,[data-testid="stTooltipContent"],[data-testid="stTooltipContent"] *,[data-testid="stToast"],[data-testid="stToast"] *{color:var(--sn-ink)!important}
+[role="tooltip"],[data-baseweb="tooltip"],[data-testid="stTooltipContent"],[data-testid="stToast"]{background:var(--sn-white)!important;border:1px solid var(--sn-border)!important}
+
+/* Compact signed-in workspace only. The landing page has no workspace marker. */
+.sn-workspace-marker{display:none}
+body:has(.sn-workspace-marker) [data-testid="stMainBlockContainer"]{padding:3.6rem 1.5rem 1.5rem;max-width:1800px}
+body:has(.sn-workspace-marker) [data-testid="stVerticalBlock"]{gap:.5rem}
+body:has(.sn-workspace-marker) [data-testid="stHorizontalBlock"]{gap:.85rem;align-items:start}
+body:has(.sn-workspace-marker) h1{font-size:1.7rem;padding:.15rem 0 .45rem}
+body:has(.sn-workspace-marker) h2{font-size:1.35rem;padding:.2rem 0 .4rem}
+body:has(.sn-workspace-marker) h3{font-size:1.1rem;padding:.15rem 0 .3rem}
+body:has(.sn-workspace-marker) p{margin-bottom:.3rem;line-height:1.45}
+body:has(.sn-workspace-marker) [data-testid="stForm"]{padding:.75rem}
+body:has(.sn-workspace-marker) [data-testid="stWidgetLabel"] p{font-size:.875rem;line-height:1.3;margin:0 0 .15rem}
+body:has(.sn-workspace-marker) input,body:has(.sn-workspace-marker) textarea,body:has(.sn-workspace-marker) [role="combobox"]{font-size:.875rem!important;color:var(--sn-ink)!important;caret-color:var(--sn-ink)}
+body:has(.sn-workspace-marker) button{min-height:2.2rem;font-weight:700}
+body:has(.sn-workspace-marker) button[kind="primary"],body:has(.sn-workspace-marker) button[kind="primaryFormSubmit"]{background:#164B99!important;color:#FFFFFF!important}
+body:has(.sn-workspace-marker) button[kind="primary"] *,body:has(.sn-workspace-marker) button[kind="primaryFormSubmit"] *{color:#FFFFFF!important}
+body:has(.sn-workspace-marker) button[kind="secondary"],body:has(.sn-workspace-marker) button[kind="secondaryFormSubmit"]{background:var(--sn-white)!important;color:var(--sn-ink)!important}
+body:has(.sn-workspace-marker) button[kind="secondary"] *,body:has(.sn-workspace-marker) button[kind="secondaryFormSubmit"] *{color:var(--sn-ink)!important}
+body:has(.sn-workspace-marker) button[kind]:hover{background:#F8E8B4!important;color:#123263!important}
+body:has(.sn-workspace-marker) button[kind]:hover *{color:#123263!important}
+body:has(.sn-workspace-marker) button:disabled{opacity:.65}
+body:has(.sn-workspace-marker) [data-testid="stCheckbox"] label,body:has(.sn-workspace-marker) [data-testid="stRadio"] label{color:var(--sn-ink)!important}
+body:has(.sn-workspace-marker) [data-baseweb="tag"]{background:var(--sn-gold-tint)!important}
+body:has(.sn-workspace-marker) [data-baseweb="tag"] *{color:var(--sn-ink)!important}
+body:has(.sn-workspace-marker) [data-testid="stMetric"]{padding:.45rem .7rem}
+body:has(.sn-workspace-marker) [data-testid="stSidebarContent"]{padding-top:.7rem}
+body:has(.sn-workspace-marker) [data-testid="stCaptionContainer"],body:has(.sn-workspace-marker) [data-testid="stCaptionContainer"] *{color:var(--sn-muted)!important}
+/* Preserve the grid's native high-contrast text rather than inverting its canvas. */
+body:has(.sn-workspace-marker) [data-testid="stDataFrame"] canvas{filter:none!important}
+body:has(.sn-workspace-marker) [data-testid="stMultiSelect"] [data-baseweb="select"]>div{background:var(--sn-white)!important;color:var(--sn-ink)!important;border-color:var(--sn-border)!important}
+@media(max-width:800px){
+ body:has(.sn-workspace-marker) [data-testid="stMainBlockContainer"]{padding:3.6rem .75rem .75rem}
+ body:has(.sn-workspace-marker) [data-testid="stHorizontalBlock"]{flex-direction:column;gap:.5rem}
+ body:has(.sn-workspace-marker) [data-testid="stColumn"]{width:100%!important;flex:1 1 100%!important;min-width:0!important}
+}
