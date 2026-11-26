@@ -17,6 +17,21 @@ def enqueue(p,job_version_id,resume_id,request_id=None):
         result=one(c,"INSERT INTO tasks(tenant_id,owner_user_id,auth_version,kind,payload,request_id) VALUES(%(t)s::uuid,%(u)s::uuid,%(v)s,'compare',%(payload)s::jsonb,%(rid)s) ON CONFLICT(tenant_id,owner_user_id,request_id) DO UPDATE SET request_id=EXCLUDED.request_id RETURNING id",scoped(p,v=p.auth_version,payload=json.dumps(dict(job_version_id=str(job_version_id),resume_id=str(resume_id))),rid=request_id or str(uuid.uuid4())))
         return str(result['id'])
 
+def enqueue_batch(p,jobs,resume_id,limit=10):
+    """Queue unscored full descriptions in the given order, skipping work already done or pending."""
+    with transaction(p) as c:
+        found=rows(c,"SELECT job_version_id::text v FROM assessments WHERE resume_id=%(r)s::uuid UNION SELECT payload->>'job_version_id' FROM tasks WHERE state IN ('queued','running') AND payload->>'resume_id'=%(text)s",dict(r=str(resume_id),text=str(resume_id)))
+    done={x['v'] for x in found}
+    queued=0;stopped=''
+    for job in jobs:
+        if queued>=limit: break
+        if str(job['version_id']) in done or job['completeness']!='full': continue
+        try: enqueue(p,job['version_id'],resume_id)
+        except AppError as exc:
+            stopped=str(exc);break
+        queued+=1
+    return dict(queued=queued,stopped=stopped)
+
 def log_event(event,**fields):
     DATA.mkdir(parents=True,exist_ok=True)
     with (DATA/'operations.jsonl').open('a',encoding='utf-8') as f:

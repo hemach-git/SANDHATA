@@ -27,7 +27,7 @@ async def download(request):
         if kind=='resume':
             data,ext=resume_download(p,identifier); filename='SANDHATA_RESUME'+ext;media='application/octet-stream'
         elif kind=='jobs':
-            data=csv_bytes([{k:v for k,v in j.items() if k not in ('body','raw_html')} for j in list_jobs(p,limit=200)])
+            data=csv_bytes([{k:v for k,v in j.items() if k not in ('body','raw_html')} for j in list_jobs(p)])
             filename='SANDHATA_JOBS.csv';media='text/csv'
         elif kind=='tracker': data=csv_bytes(list_applications(p));filename='SANDHATA_APPLICATIONS.csv';media='text/csv'
         elif kind=='audit': data=csv_bytes(audit_events(p));filename='SANDHATA_AUDIT.csv';media='text/csv'

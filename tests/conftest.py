@@ -17,7 +17,7 @@ def family():
     yield principals
     with psycopg.connect(url) as c:
         # Test-created tenant UUID only; never truncate or delete the owner's real tenant.
-        for table in ['maintenance_receipts','deletion_tombstones','capabilities','tasks','assessments','status_events','applications','passages','resumes','job_versions','jobs','profiles','admin_audit','invitations','memberships']:
+        for table in ['maintenance_receipts','deletion_tombstones','capabilities','tasks','assessments','status_events','applications','passages','resumes','job_versions','jobs','profiles','watchlists','admin_audit','invitations','memberships']:
             c.execute(f'DELETE FROM {table} WHERE tenant_id=%s',(tenant,))
         c.execute('DELETE FROM accounts WHERE id=ANY(%s::uuid[])',(users,))
     folder=(DATA/tenant).resolve()
