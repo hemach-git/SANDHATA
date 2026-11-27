@@ -12,6 +12,7 @@ from .db import resolve_identity,transaction,rows,one,scoped
 from . import repository as repo
 from . import identity as auth
 from . import connectors
+from .ui_documents import document_library,admin_documents
 from .worker import enqueue,enqueue_batch
 from .targeting import TARGET_FILTERS,SUGGESTED_BOARDS,priority
 from .agenda import build_agenda,follow_up_calendar
@@ -228,23 +229,7 @@ def discover(p,resumes,selected_resume,query):
                 if assessments: result_view(assessments[0]['result'])
 
 def resume_library(p,query):
-    st.header('Your resume library')
-    st.caption('Only you can access your original files and parsed evidence. Uploading creates an immutable version.')
-    with st.form('resume_upload',clear_on_submit=True):
-        file=st.file_uploader('PDF or DOCX · text documents up to 10 MB',type=['pdf','docx'])
-        label=st.text_input('Version label',placeholder='AI Engineering · October 2026')
-        if st.form_submit_button('Upload and parse',type='primary'):
-            if file is None: raise AppError('Choose a document first.')
-            repo.upload_resume(p,file.getvalue(),file.name,label);toast('Resume version saved');st.rerun()
-    for r in repo.list_resumes(p):
-        if query and query.lower() not in r['label'].lower(): continue
-        with st.expander(r['label']+' · '+r['created_at'].strftime('%b %d %H:%M UTC')):
-            detail=repo.resume_detail(p,r['id'])
-            st.text(detail['body'])
-            st.caption('Parser: '+detail['parser_version']+' · Content fingerprint '+r['file_hash'][:12])
-            private_download(p,'Download your original','resume',r['id'])
-            confirm=st.checkbox('Delete this version and its comparison evidence',key='deleteconfirm_'+str(r['id']))
-            if st.button('Delete resume',key='delete_'+str(r['id']),disabled=not confirm): repo.delete_resume(p,r['id']);st.rerun()
+    document_library(p,query,private_download)
 
 def reset_tracker_draft(prefix):
     """Discard browser draft widget values only; never call storage APIs."""
@@ -448,7 +433,7 @@ def admin_console(p):
     # Rechecks role in every service; the navigation check is only presentation.
     st.header('Administrator console')
     st.caption('Manage user access, usage, system health and housekeeping.')
-    tabs=st.tabs(['Users','Invitations','Usage and health','Audit','Housekeeping'])
+    tabs=st.tabs(['Users','Invitations','Usage and health','Audit','Housekeeping','Documents'])
     with tabs[0]:
         accounts=auth.list_accounts(p)
         compact_dataframe([{k:str(v) if isinstance(v,uuid.UUID) else v for k,v in row.items()} for row in accounts],use_container_width=True,hide_index=True)
@@ -515,6 +500,8 @@ def admin_console(p):
             if st.button('Execute confirmed maintenance',disabled=not(confirmation and second),type='primary'):
                 result=auth.maintenance(p,kind,target,False,preview['count'],str(uuid.uuid4()),reason)
                 st.session_state.pop('maintenance_preview',None);st.success('Maintenance completed');st.json(result)
+
+    with tabs[5]: admin_documents(p,private_download)
 
 def main():
     st.set_page_config(page_title='SANDHĀTĀ · Career Intelligence',page_icon='↗',layout='wide')

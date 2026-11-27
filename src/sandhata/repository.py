@@ -2,11 +2,15 @@ import hashlib,json,uuid
 from pathlib import Path
 from datetime import datetime,timezone
 from urllib.parse import urlsplit
+from sqlalchemy.exc import DBAPIError
 from .config import DATA,AppError
 from .db import transaction,rows,one,scoped
 from .parsing import plain_html,parse_resume,passages
 
 STATUSES=['Saved','Preparing','Applied','Screening','Interviewing','Offer','Hired','Rejected','Withdrawn','Cancelled']
+
+DOC_TYPES={'resume':'Resume','cover_letter':'Cover letter','other':'Other document'}
+MAX_DOCUMENTS=50
 
 def private_path(key):
     path=(DATA/key).resolve()
@@ -71,8 +75,14 @@ def job_detail(p,job_id,version_id=None):
         if not r: raise AppError('Job unavailable in your workspace.')
         return r
 
-def upload_resume(p,data,filename,label):
+def check_label(label):
     if not label.strip() or len(label)>100: raise AppError('Choose a label of at most 100 characters.')
+    return label.strip()
+
+def upload_resume(p,data,filename,label,doc_type='resume'):
+    """Store a resume, cover letter or other document. Only resumes are indexed and compared."""
+    check_label(label)
+    if doc_type not in DOC_TYPES: raise AppError('Choose a valid document type.')
     parsed=parse_resume(data,filename)
     rid=str(uuid.uuid4()); key=f'{p.tenant_id}/{p.user_id}/{rid}.{parsed["ext"]}'
     file=private_path(key)
@@ -80,19 +90,47 @@ def upload_resume(p,data,filename,label):
         # Serialize quota checks for concurrent uploads in this member workspace.
         c.exec_driver_sql('SELECT pg_advisory_xact_lock(hashtextextended(%(key)s,0))',dict(key=p.tenant_id+p.user_id))
         existing=rows(c,'SELECT object_key FROM resumes')
-        if len(existing)>=20 or sum(private_path(r['object_key']).stat().st_size for r in existing if private_path(r['object_key']).exists())+len(data)>100*1024*1024: raise AppError('Resume or storage quota reached. Delete an unused version first.')
+        if len(existing)>=MAX_DOCUMENTS or sum(private_path(r['object_key']).stat().st_size for r in existing if private_path(r['object_key']).exists())+len(data)>100*1024*1024: raise AppError('Document or storage quota reached. Delete an unused version first.')
         file.parent.mkdir(parents=True,exist_ok=True)
         file.write_bytes(data)
         try:
-            c.exec_driver_sql('INSERT INTO resumes(id,tenant_id,owner_user_id,label,object_key,file_hash,body,parser_version) VALUES(%(id)s::uuid,%(t)s::uuid,%(u)s::uuid,%(label)s,%(key)s,%(hash)s,%(body)s,%(parser)s)',scoped(p,id=rid,label=label.strip(),key=key,hash=parsed['file_hash'],body=parsed['body'],parser=parsed['parser_version']))
-            index_text(c,p,rid,'resume',parsed['body'])
+            c.exec_driver_sql('INSERT INTO resumes(id,tenant_id,owner_user_id,label,object_key,file_hash,body,parser_version,doc_type) VALUES(%(id)s::uuid,%(t)s::uuid,%(u)s::uuid,%(label)s,%(key)s,%(hash)s,%(body)s,%(parser)s,%(kind)s)',scoped(p,id=rid,kind=doc_type,label=label.strip(),key=key,hash=parsed['file_hash'],body=parsed['body'],parser=parsed['parser_version']))
+            if doc_type=='resume': index_text(c,p,rid,'resume',parsed['body'])
         except Exception:
             file.unlink(missing_ok=True)
             raise
     return rid
 
 def list_resumes(p):
-    with transaction(p) as c: return rows(c,'SELECT id,label,file_hash,created_at,parser_version FROM resumes ORDER BY created_at DESC')
+    """Active resumes only: the choices offered for comparisons and applications."""
+    with transaction(p) as c: return rows(c,"SELECT id,label,file_hash,created_at,parser_version FROM resumes WHERE doc_type='resume' AND active ORDER BY created_at DESC")
+
+def list_documents(p):
+    with transaction(p) as c: return rows(c,'SELECT id,label,file_hash,created_at,parser_version,doc_type,active FROM resumes ORDER BY created_at DESC')
+
+def update_document(p,document_id,label=None,active=None):
+    if label is not None: label=check_label(label)
+    with transaction(p) as c:
+        found=one(c,'UPDATE resumes SET label=coalesce(%(label)s,label),active=coalesce(%(active)s,active) WHERE id=%(id)s::uuid RETURNING id',dict(label=label,active=active,id=str(document_id)))
+        if not found: raise AppError('Document unavailable in your workspace.')
+
+def admin_list_documents(p):
+    with transaction(p,admin=True) as c: return rows(c,'SELECT * FROM appsec.admin_list_documents()')
+
+def admin_document(p,document_id,operation,reason):
+    """Audited administrator access to any member's document in this workspace."""
+    if len(reason.strip())<5: raise AppError('Provide a reason of at least five characters.')
+    try:
+        with transaction(p,admin=True) as c:
+            result=one(c,'SELECT appsec.admin_document(%(id)s::uuid,%(op)s,%(why)s) data',dict(id=str(document_id),op=operation,why=reason.strip()))['data']
+    except DBAPIError as exc: raise AppError('The document is unavailable or the action is not allowed.') from exc
+    if operation=='delete': private_path(result['object_key']).unlink(missing_ok=True)
+    return {k:v for k,v in result.items() if k!='object_key' or operation=='download'}
+
+def admin_download(p,document_id,reason):
+    path=private_path(admin_document(p,document_id,'download',reason)['object_key'])
+    if not path.exists(): raise AppError('Original file unavailable; contact the operator about recovery.')
+    return path.read_bytes(),path.suffix
 
 def resume_detail(p,resume_id):
     with transaction(p) as c:
@@ -190,7 +228,7 @@ def update_application(p,app_id,status,notes,occurred_at,request_id,resume_id=No
     with transaction(p) as c:
         app=one(c,'SELECT * FROM applications WHERE id=%(id)s::uuid FOR UPDATE',dict(id=str(app_id)))
         if not app: raise AppError('Tracker item unavailable in your workspace.')
-        if resume_id and not one(c,'SELECT id FROM resumes WHERE id=%(id)s::uuid',dict(id=str(resume_id))): raise AppError('Selected resume unavailable.')
+        if resume_id and not one(c,"SELECT id FROM resumes WHERE id=%(id)s::uuid AND doc_type='resume'",dict(id=str(resume_id))): raise AppError('Selected resume unavailable.')
         job=one(c,'SELECT location,workplace,salary,job_type FROM jobs WHERE id=%(id)s::uuid FOR UPDATE',dict(id=str(app['job_id'])))
         status_changed=status!=app['status']
         changed=status_changed or notes!=app['notes'] or follow_up!=app['follow_up'] or (resume_id is not None and str(resume_id)!=str(app['resume_id']))

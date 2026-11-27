@@ -18,7 +18,7 @@ SANDHĀTĀ now runs as a local application in its own repository outside BRIHASP
 | Analytics | Status donut, weekly applications, observed event counts, source and resume cohort tables, latest per-job gaps | Descriptive outcomes; no predictions or causal resume-effect claims |
 | Memory and retrieval | Saved profiles, immutable document text, PostgreSQL full-text passages with offsets | Lexical retrieval; no embedding service or conversational answer generator |
 | MCP | Local stdio tools search_my_jobs, search_my_evidence and list_my_tracker | Fifteen-minute owner capability; role changes revoke authority; no writes |
-| Administration | Users, roles, quotas, suspension, invitations and revocation, safe audit, usage, previewed housekeeping | Administrator UI does not grant access to another member's career content |
+| Administration | Users, roles, quotas, suspension, invitations and revocation, safe audit, usage, previewed housekeeping | Administrators can open and manage member documents with an audited reason; jobs, tracker records and comparisons remain owner-only |
 | Operations | Durable task leases, cancellation, JSON metadata logs, heartbeat, encrypted backup and isolated restore | No external telemetry platform or notification channel configured |
 
 ## Start and access
