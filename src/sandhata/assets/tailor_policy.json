@@ -1,0 +1,61 @@
+{
+  "version": "tailor-policy-v2",
+  "limits": {"bullet_chars": 400, "summary_chars": 600, "growth": 1.4},
+  "aliases": [
+    ["aws", "amazon web services"],
+    ["gcp", "google cloud platform", "google cloud"],
+    ["k8s", "kubernetes"],
+    ["llm", "llms", "large language model", "large language models"],
+    ["rag", "retrieval-augmented generation", "retrieval augmented generation"],
+    ["ml", "machine learning"],
+    ["ai", "artificial intelligence"],
+    ["genai", "gen ai", "generative ai"],
+    ["postgres", "postgresql"],
+    ["js", "javascript"]
+  ],
+  "tech_terms": [
+    "agents", "airflow", "ansible", "azure", "bedrock", "chromadb", "databricks", "docker", "elasticsearch", "embeddings",
+    "faiss", "fastapi", "fine-tuning", "grafana", "graphql", "java", "javascript", "kafka", "kubernetes", "langchain",
+    "langgraph", "llamaindex", "microservices", "mlflow", "mlops", "mongodb", "neo4j", "ollama", "openai", "pgvector",
+    "pinecone", "postgresql", "prometheus", "python", "pytorch", "rag", "react", "redis", "sagemaker", "scala",
+    "snowflake", "spark", "sql", "tensorflow", "terraform", "typescript", "vertex", "weaviate"
+  ],
+  "claim_terms": [
+    "agentic", "architecture", "automation", "budget", "client-facing", "compliance", "cross-functional", "customer",
+    "customer-facing", "deployment", "discovery", "distributed", "enterprise", "evaluation", "executive", "global",
+    "governance", "guardrails", "hiring", "inference", "latency", "leadership", "mentoring", "multi-agent",
+    "observability", "onboarding", "orchestration", "performance", "pipeline", "platform", "portfolio", "pre-sales",
+    "production", "prototype", "real-time", "reliability", "roadmap", "scalable", "scale", "security", "stakeholder",
+    "strategy", "team"
+  ],
+  "credential_terms": ["certified", "certification", "certificate", "degree", "phd", "master's", "masters", "bachelor's", "bachelors", "license", "licensed", "accredited"],
+  "title_terms": ["senior", "staff", "principal", "manager", "director", "head", "vp", "president", "chief", "founder", "supervisor"],
+  "scope_verbs": {
+    "lead": ["lead", "leads", "led", "leading", "leader", "leadership", "co-led"],
+    "manage": ["manage", "manages", "managed", "managing", "management"],
+    "own": ["own", "owns", "owned", "owning", "owner", "ownership"],
+    "direct": ["directed", "directs", "directing"],
+    "architect": ["architect", "architects", "architected", "architecting"],
+    "head": ["head", "headed", "heading"],
+    "hire": ["hire", "hires", "hired", "hiring", "recruited", "recruiting"],
+    "mentor": ["mentor", "mentors", "mentored", "mentoring", "coached", "coaching"],
+    "spearhead": ["spearhead", "spearheads", "spearheaded", "spearheading", "championed", "pioneered"],
+    "found": ["founded", "founding", "co-founded", "established"],
+    "oversee": ["oversee", "oversees", "oversaw", "overseeing", "supervised", "supervising"],
+    "drive": ["drove", "drives", "driving", "orchestrated"]
+  },
+  "qualifiers": {
+    "shared": ["helped", "helping", "assisted", "assisting", "contributed", "contributing", "supported", "supporting", "participated", "participating", "collaborated", "collaborating", "part of", "team that", "member of", "co-led", "co-developed", "co-authored", "co-designed"],
+    "partial": ["part of", "one of", "module of", "portion of", "component of", "partially"],
+    "not_done": ["planned", "planning", "proposed", "attempted", "aimed to", "intended to"],
+    "negated": ["never", "not", "no"]
+  },
+  "absolute_words": ["only", "first", "sole", "solely", "all", "every", "entire", "entirely", "eliminated", "eliminating", "guaranteed", "always", "never", "best", "unique", "flawless", "zero"],
+  "sensitive_patterns": [
+    "sponsorship", "\\bvisa\\b", "work authori[sz]ation", "authori[sz]ed to work", "\\bcitizen(ship)?\\b", "green card",
+    "\\bsalary\\b", "expected compensation", "compensation expectation", "\\bethnicity\\b", "\\bgender\\b", "disabilit",
+    "\\bveteran\\b", "\\bcriminal\\b", "\\bfelony\\b", "security clearance", "\\breligio", "\\bpregnan", "marital status"
+  ],
+  "sentence_starters": ["a", "an", "the", "as", "in", "on", "for", "with", "and", "to", "of", "by", "from", "across", "built", "led", "ran", "drove", "grew", "cut", "set", "won", "wrote", "made", "oversaw", "software", "engineer", "experienced", "hands-on", "focused", "held", "kept", "took", "used", "gave", "put", "brought", "taught", "sold", "using", "through", "after", "following"],
+  "neutral_words": ["a", "an", "the", "and", "or", "to", "of", "for", "with", "in", "on", "by", "from", "at", "as", "that", "which", "using", "used", "use", "via", "through", "across", "into", "including", "while", "its", "their", "this"]
+}

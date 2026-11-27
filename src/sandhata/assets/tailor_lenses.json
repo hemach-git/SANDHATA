@@ -1,0 +1,68 @@
+{
+  "version": "tailor-lens-v1",
+  "note": "A lens decides which existing resume evidence to bring forward. It never adds claims. Expectations only feed the gap panel.",
+  "lenses": {
+    "ai_engineer.senior": {
+      "label": "Senior AI Engineer",
+      "terms": ["llm", "rag", "agents", "production", "evaluation", "reliability", "latency", "cost", "inference", "retrieval", "guardrails", "observability", "pipeline"],
+      "expects": [
+        {"label": "LLM or RAG systems built", "terms": ["llm", "rag", "large language model", "retrieval", "agents", "agentic", "generative ai"]},
+        {"label": "Production delivery", "terms": ["production", "deployed", "launched", "shipped"]},
+        {"label": "Evaluation, reliability or cost work", "terms": ["evaluation", "evaluated", "reliability", "latency", "cost", "observability", "monitoring"]}
+      ]
+    },
+    "ai_engineer.lead": {
+      "label": "Lead AI Engineer",
+      "extends": "ai_engineer.senior",
+      "terms": ["architecture", "mentored", "technical direction", "design review", "cross-team", "cross-functional", "led"],
+      "expects": [
+        {"label": "Technical direction or architecture decisions", "terms": ["architecture", "architected", "technical direction", "design decisions", "design review"]},
+        {"label": "Mentoring engineers", "terms": ["mentored", "mentoring", "coached", "coaching"]},
+        {"label": "Delivery across teams", "terms": ["cross-team", "cross-functional", "across teams", "multiple teams"]}
+      ]
+    },
+    "ai_engineer.manager": {
+      "label": "AI Engineering Manager",
+      "extends": "ai_engineer.senior",
+      "terms": ["managed", "hiring", "roadmap", "stakeholder", "budget", "team", "mentored", "performance reviews"],
+      "expects": [
+        {"label": "People leadership", "terms": ["direct reports", "people leadership", "managed a team", "managed engineers", "line management", "performance reviews"]},
+        {"label": "Hiring", "terms": ["hired", "hiring", "recruited", "recruiting", "interviewed candidates"]},
+        {"label": "Roadmap ownership", "terms": ["roadmap"]},
+        {"label": "Budget responsibility", "terms": ["budget"]}
+      ]
+    },
+    "fde.senior": {
+      "label": "Senior AI Forward Deployed Engineer",
+      "terms": ["customer", "client", "deployed", "discovery", "prototype", "production", "integration", "llm", "rag", "agents", "working sessions"],
+      "expects": [
+        {"label": "Customer-facing delivery", "terms": ["customer", "client", "users", "working sessions", "on-site"]},
+        {"label": "Prototype taken to production", "terms": ["prototype", "production", "deployed", "launched"]},
+        {"label": "Integration with existing systems", "terms": ["integration", "integrated", "api"]},
+        {"label": "Discovery or requirements work", "terms": ["discovery", "requirements", "workshops", "working sessions"]}
+      ]
+    },
+    "fde.lead": {
+      "label": "Lead AI Forward Deployed Engineer",
+      "extends": "fde.senior",
+      "terms": ["engagement", "scoping", "executive", "stakeholder", "product feedback", "mentored", "led"],
+      "expects": [
+        {"label": "Leading engagements", "terms": ["engagement", "led delivery", "led the delivery", "account"]},
+        {"label": "Scoping work", "terms": ["scoping", "scoped", "estimates", "statement of work"]},
+        {"label": "Executive communication", "terms": ["executive", "leadership team", "stakeholder"]},
+        {"label": "Field learning turned into product feedback", "terms": ["product feedback", "product team", "feature requests", "roadmap"]}
+      ]
+    },
+    "fde.manager": {
+      "label": "AI Forward Deployed Engineering Manager",
+      "extends": "fde.senior",
+      "terms": ["managed", "hiring", "engagement", "portfolio", "customer outcomes", "team", "stakeholder", "budget"],
+      "expects": [
+        {"label": "Building and running a field team", "terms": ["managed a team", "built a team", "direct reports", "people leadership", "managed engineers"]},
+        {"label": "Engagement portfolio", "terms": ["portfolio", "multiple engagements", "accounts"]},
+        {"label": "Hiring", "terms": ["hired", "hiring", "recruited", "recruiting"]},
+        {"label": "Customer outcomes", "terms": ["adoption", "customer outcomes", "renewal", "satisfaction"]}
+      ]
+    }
+  }
+}

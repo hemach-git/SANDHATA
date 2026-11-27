@@ -83,6 +83,24 @@ def task_view(p,task):
         if task['trace']:
             with st.expander('Run execution details',expanded=False): st.json(task['trace'])
 
+def tailoring_measures(p):
+    from . import tailoring
+    if not tailoring.available(p): return
+    found=tailoring.measures(p)
+    st.subheader('Resume tailoring')
+    if not found['runs']: st.caption('No tailoring runs yet.');return
+    a,b,c,d=st.columns(4)
+    a.metric('Tailoring runs',found['runs']);b.metric('Failed',found['states'].get('failed',0))
+    c.metric('Needed a repair',found['repaired'])
+    d.metric('Median model time','Not measured' if found['median_seconds'] is None else f"{found['median_seconds']:.0f} s")
+    if found['decisions']:
+        st.caption('Latest decision for each proposal')
+        st.dataframe(found['decisions'],hide_index=True,use_container_width=True)
+    if found['dropped']:
+        st.caption('Proposals removed by checks before you saw them')
+        st.dataframe([dict(reason=k,count=v) for k,v in sorted(found['dropped'].items())],hide_index=True,use_container_width=True)
+    if found['failures']: st.caption('Run error codes: '+', '.join(f'{k} ({v})' for k,v in sorted(found['failures'].items())))
+
 def diagnostics(p):
     st.header('Your runs and evidence')
     show_flash()
@@ -96,6 +114,7 @@ def diagnostics(p):
     worker_status()
     if not tasks: st.info('No comparisons yet. Choose a resume, then compare roles in Discover.')
     for task in tasks: task_view(p,task)
+    tailoring_measures(p)
     st.subheader('Search saved evidence')
     question=st.text_input('Find a skill, responsibility, or phrase in your saved evidence')
     if question:

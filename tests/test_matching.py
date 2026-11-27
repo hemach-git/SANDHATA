@@ -68,3 +68,14 @@ def test_revocation_checked_before_every_inference():
     with pytest.raises(AppError):
         build_graph(analyzer,revoked).invoke({'job':'Python','resume':'Python','completeness':'full','trace':[]})
     assert not calls
+
+@pytest.mark.parametrize('status',['not_evidenced','unknown'])
+def test_status_written_as_the_missing_quote_is_cleared(status):
+    item=dict(req(status),resume_quote=status)
+    out=validate_evidence({'requirements':[item]},'Python','Built Java services.')
+    assert out['requirements'][0]['resume_quote']=='' and out['requirements'][0]['resume_offset'] is None
+
+@pytest.mark.parametrize('status,quote',[('supported','supported'),('not_evidenced','Invented experience'),('unknown','not_evidenced')])
+def test_other_unverifiable_quotes_are_still_rejected(status,quote):
+    item=dict(req(status),resume_quote=quote)
+    with pytest.raises(AppError): validate_evidence({'requirements':[item]},'Python','Built Java services.')

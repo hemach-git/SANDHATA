@@ -79,6 +79,11 @@ def check_label(label):
     if not label.strip() or len(label)>100: raise AppError('Choose a label of at most 100 characters.')
     return label.strip()
 
+def check_document_quota(c,new_bytes):
+    """Call inside the member's upload lock, before writing the new file."""
+    existing=rows(c,'SELECT object_key FROM resumes')
+    if len(existing)>=MAX_DOCUMENTS or sum(private_path(r['object_key']).stat().st_size for r in existing if private_path(r['object_key']).exists())+new_bytes>100*1024*1024: raise AppError('Document or storage quota reached. Delete an unused version first.')
+
 def upload_resume(p,data,filename,label,doc_type='resume'):
     """Store a resume, cover letter or other document. Only resumes are indexed and compared."""
     check_label(label)
@@ -89,8 +94,7 @@ def upload_resume(p,data,filename,label,doc_type='resume'):
     with transaction(p) as c:
         # Serialize quota checks for concurrent uploads in this member workspace.
         c.exec_driver_sql('SELECT pg_advisory_xact_lock(hashtextextended(%(key)s,0))',dict(key=p.tenant_id+p.user_id))
-        existing=rows(c,'SELECT object_key FROM resumes')
-        if len(existing)>=MAX_DOCUMENTS or sum(private_path(r['object_key']).stat().st_size for r in existing if private_path(r['object_key']).exists())+len(data)>100*1024*1024: raise AppError('Document or storage quota reached. Delete an unused version first.')
+        check_document_quota(c,len(data))
         file.parent.mkdir(parents=True,exist_ok=True)
         file.write_bytes(data)
         try:
@@ -268,4 +272,5 @@ def assessment_detail(p,assessment_id):
         return r
 
 def tasks(p):
-    with transaction(p) as c: return rows(c,'SELECT id,state,error_code,trace,result_id,created_at,finished_at FROM tasks ORDER BY created_at DESC LIMIT 50')
+    """Comparison tasks only; tailoring runs have their own list in tailoring.list_runs."""
+    with transaction(p) as c: return rows(c,"SELECT id,state,error_code,trace,result_id,created_at,finished_at FROM tasks WHERE kind='compare' ORDER BY created_at DESC LIMIT 50")

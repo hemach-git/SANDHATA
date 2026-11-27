@@ -102,6 +102,60 @@ CREATE TABLE IF NOT EXISTS capabilities (
  created_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- Resume Tailor (F06). See docs/25_Resume_Tailor_Design.md.
+CREATE UNIQUE INDEX IF NOT EXISTS assessments_owner_id_key ON assessments(tenant_id,owner_user_id,id);
+CREATE TABLE IF NOT EXISTS tailor_runs (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL, owner_user_id uuid NOT NULL,
+ resume_id uuid NOT NULL, job_version_id uuid NOT NULL, assessment_id uuid,
+ track text NOT NULL CHECK(track IN ('fde','ai_engineer')), level text NOT NULL CHECK(level IN ('senior','lead','manager')),
+ provider text NOT NULL, model text NOT NULL, prompt_version text NOT NULL, policy_version text NOT NULL, lens_version text NOT NULL,
+ source_hash text NOT NULL, cache_key text NOT NULL,
+ state text NOT NULL DEFAULT 'queued' CHECK(state IN ('queued','running','ready_for_review','composed','failed','expired')),
+ trace jsonb NOT NULL DEFAULT '[]', dropped jsonb NOT NULL DEFAULT '{}',
+ created_at timestamptz NOT NULL DEFAULT now(), expires_at timestamptz NOT NULL DEFAULT now()+interval '14 days',
+ UNIQUE(tenant_id,owner_user_id,id), UNIQUE(tenant_id,owner_user_id,cache_key),
+ FOREIGN KEY(tenant_id,owner_user_id,resume_id) REFERENCES resumes(tenant_id,owner_user_id,id) ON DELETE CASCADE,
+ FOREIGN KEY(tenant_id,owner_user_id,job_version_id) REFERENCES job_versions(tenant_id,owner_user_id,id) ON DELETE CASCADE,
+ FOREIGN KEY(tenant_id,owner_user_id,assessment_id) REFERENCES assessments(tenant_id,owner_user_id,id) ON DELETE SET NULL (assessment_id)
+);
+CREATE TABLE IF NOT EXISTS tailor_suggestions (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL, owner_user_id uuid NOT NULL, run_id uuid NOT NULL,
+ unit_id text NOT NULL, start_offset integer NOT NULL CHECK(start_offset>=0), end_offset integer NOT NULL,
+ change_type text NOT NULL CHECK(change_type IN ('rephrase','reorder','skills_reorder','summary','deemphasize')),
+ before_text text NOT NULL, after_text text NOT NULL DEFAULT '', new_position integer,
+ evidence jsonb NOT NULL CHECK(jsonb_typeof(evidence)='array' AND evidence<>'[]'::jsonb),
+ job_quote text NOT NULL, job_offset integer NOT NULL, rationale text NOT NULL DEFAULT '',
+ warnings jsonb NOT NULL DEFAULT '[]', rank integer NOT NULL DEFAULT 0,
+ CHECK(end_offset>start_offset),
+ UNIQUE(tenant_id,owner_user_id,id), UNIQUE(tenant_id,owner_user_id,run_id,unit_id),
+ FOREIGN KEY(tenant_id,owner_user_id,run_id) REFERENCES tailor_runs(tenant_id,owner_user_id,id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS suggestion_decisions (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL, owner_user_id uuid NOT NULL, suggestion_id uuid NOT NULL,
+ sequence bigint GENERATED ALWAYS AS IDENTITY,
+ decision text NOT NULL CHECK(decision IN ('approve','reject','edit_approve')),
+ final_text text, user_attested boolean NOT NULL DEFAULT false, request_id text NOT NULL,
+ decided_at timestamptz NOT NULL DEFAULT now(),
+ CHECK((decision='edit_approve')=(final_text IS NOT NULL)), CHECK(NOT user_attested OR decision='edit_approve'),
+ UNIQUE(tenant_id,owner_user_id,request_id),
+ FOREIGN KEY(tenant_id,owner_user_id,suggestion_id) REFERENCES tailor_suggestions(tenant_id,owner_user_id,id) ON DELETE CASCADE
+);
+ALTER TABLE tailor_runs ADD COLUMN IF NOT EXISTS verifier_model text NOT NULL DEFAULT '';
+ALTER TABLE tailor_runs ADD COLUMN IF NOT EXISTS gaps jsonb NOT NULL DEFAULT '[]';
+ALTER TABLE tailor_runs ADD COLUMN IF NOT EXISTS error_code text;
+ALTER TABLE tailor_suggestions ADD COLUMN IF NOT EXISTS verdict jsonb NOT NULL DEFAULT '{}';
+-- A tailored version outlives its source and its run; only the lineage link is cleared.
+ALTER TABLE resumes ADD COLUMN IF NOT EXISTS parent_resume_id uuid;
+ALTER TABLE resumes ADD COLUMN IF NOT EXISTS tailor_run_id uuid;
+ALTER TABLE resumes DROP CONSTRAINT IF EXISTS resumes_parent_fk;
+ALTER TABLE resumes ADD CONSTRAINT resumes_parent_fk FOREIGN KEY(tenant_id,owner_user_id,parent_resume_id)
+ REFERENCES resumes(tenant_id,owner_user_id,id) ON DELETE SET NULL (parent_resume_id);
+ALTER TABLE resumes DROP CONSTRAINT IF EXISTS resumes_tailor_run_fk;
+ALTER TABLE resumes ADD CONSTRAINT resumes_tailor_run_fk FOREIGN KEY(tenant_id,owner_user_id,tailor_run_id)
+ REFERENCES tailor_runs(tenant_id,owner_user_id,id) ON DELETE SET NULL (tailor_run_id);
+ALTER TABLE tasks DROP CONSTRAINT IF EXISTS tasks_kind_check;
+ALTER TABLE tasks ADD CONSTRAINT tasks_kind_check CHECK(kind IN ('compare','tailor'));
+
 CREATE OR REPLACE FUNCTION appsec.is_admin() RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER
 SET search_path=public,pg_temp AS $$
  SELECT EXISTS(SELECT 1 FROM memberships WHERE tenant_id::text=current_setting('app.tenant_id',true)
@@ -144,7 +198,7 @@ BEGIN
 END $$;
 
 DO $$ DECLARE tbl text; BEGIN
- FOREACH tbl IN ARRAY ARRAY['profiles','jobs','job_versions','resumes','passages','applications','status_events','assessments','tasks','capabilities','watchlists'] LOOP
+ FOREACH tbl IN ARRAY ARRAY['profiles','jobs','job_versions','resumes','passages','applications','status_events','assessments','tasks','capabilities','watchlists','tailor_runs','tailor_suggestions','suggestion_decisions'] LOOP
  EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY',tbl);
  EXECUTE format('ALTER TABLE %I FORCE ROW LEVEL SECURITY',tbl);
  EXECUTE format('DROP POLICY IF EXISTS owned ON %I',tbl);
@@ -152,6 +206,10 @@ DO $$ DECLARE tbl text; BEGIN
  EXECUTE format('GRANT SELECT,INSERT,UPDATE,DELETE ON %I TO sandhata_app',tbl);
  END LOOP;
 END $$;
+-- Decisions are an append-only record; deleting the source document still removes them by cascade.
+REVOKE UPDATE,DELETE ON suggestion_decisions FROM sandhata_app;
+-- A proposal cannot change after the member has seen it; reruns replace the whole run.
+REVOKE UPDATE ON tailor_suggestions FROM sandhata_app;
 ALTER TABLE memberships ENABLE ROW LEVEL SECURITY;
 ALTER TABLE memberships FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS membership_access ON memberships;

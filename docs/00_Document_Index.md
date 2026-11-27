@@ -40,6 +40,7 @@ Read the charter and scope first, then architecture and sequence flows. Use the 
 | SANDHĀTĀ Administrator and User Access Guide | [Markdown](22_Administrator_and_User_Access_Guide.md) | [Word](../deliverables/word/22_Administrator_and_User_Access_Guide.docx) |
 | SANDHĀTĀ Implementation and Operating Handoff | [Markdown](23_Implementation_and_Operating_Handoff.md) | [Word](../deliverables/word/23_Implementation_and_Operating_Handoff.docx) |
 | SANDHĀTĀ AWS Deployment Guide | [Markdown](24_AWS_Deployment_Guide.md) | [Word](../deliverables/word/24_AWS_Deployment_Guide.docx) |
+| SANDHĀTĀ Resume Tailor (F06) Design | [Markdown](25_Resume_Tailor_Design.md) | [Word](../deliverables/word/25_Resume_Tailor_Design.docx) |
 
 ## Format and change discipline
 

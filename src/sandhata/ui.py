@@ -17,6 +17,7 @@ from .ui_today import today_page
 from .ui_discover import discover
 from .ui_results import result_view,diagnostics
 from .ui_insights import insights
+from .ui_tailor import tailor_page
 
 def resume_library(p,query):
     document_library(p,query,private_download)
@@ -197,7 +198,7 @@ def admin_console(p):
             a,b,c=st.columns(3)
             role=a.selectbox('Role',['member','admin'],index=['member','admin'].index(chosen['role']))
             state=b.selectbox('State',['active','suspended'],index=0 if chosen['state']=='active' else 1)
-            quota=c.number_input('Comparisons per UTC day',1,1000,value=chosen['quota'])
+            quota=c.number_input('Model runs per UTC day',1,1000,value=chosen['quota'],help='Comparisons and tailoring runs share this limit.')
             reason=st.text_input('Reason for account change')
             if st.form_submit_button('Update account',type='primary'):
                 auth.change_account(p,chosen['user_id'],role,state,quota,reason);toast('Account updated; sessions and task authority revoked');st.rerun()
@@ -306,7 +307,7 @@ def main():
             name=display_name(p.display_name);role='Administrator' if p.role=='admin' else 'Member workspace'
             st.write(name)
             if name!=role: st.caption(role)
-            pages=['Today','Discover','Resume Library','Tracker','Insights','Diagnostics']+(['Admin Console'] if p.role=='admin' else [])
+            pages=['Today','Discover','Resume Library','Tailor','Tracker','Insights','Diagnostics']+(['Admin Console'] if p.role=='admin' else [])
             # Discover filters keep their values while another page is open.
             for key in DISCOVER_FILTERS:
                 if key in st.session_state: st.session_state[key]=st.session_state[key]
@@ -320,6 +321,7 @@ def main():
         if page=='Today': today_page(p,selected)
         elif page=='Discover': discover(p,resumes,selected,query)
         elif page=='Resume Library': resume_library(p,query)
+        elif page=='Tailor': tailor_page(p,resumes,selected)
         elif page=='Tracker': tracker(p,resumes,query)
         elif page=='Insights': insights(p)
         elif page=='Diagnostics': diagnostics(p)

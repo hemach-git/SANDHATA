@@ -14,6 +14,8 @@ DATABASE_URL = os.getenv('SANDHATA_DATABASE_URL', '')
 WORKER_DATABASE_URL = os.getenv('SANDHATA_WORKER_DATABASE_URL', DATABASE_URL)
 MODEL_URL = os.getenv('SANDHATA_MODEL_BASE_URL', 'http://127.0.0.1:11434')
 MODEL = os.getenv('SANDHATA_MODEL_NAME', 'gpt-oss:20b')
+# The second AI check on tailored text. A different local model reduces the risk of it agreeing with the writer.
+VERIFIER_MODEL = os.getenv('SANDHATA_VERIFIER_MODEL', MODEL)
 TIMEZONE = 'America/New_York'
 MODEL_CONTEXT = int(os.getenv('SANDHATA_MODEL_CONTEXT', '32768'))
 # Combined description and resume characters (about four per token), leaving room for the 6,000 token reply.

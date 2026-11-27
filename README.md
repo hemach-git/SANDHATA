@@ -28,6 +28,7 @@ On this machine the environment and services are already installed. Open http://
 ```powershell
 .venv\Scripts\python.exe scripts/run_tests.py
 .venv\Scripts\python.exe scripts/live_evals.py
+.venv\Scripts\python.exe scripts/live_evals.py --suite tailor
 .venv\Scripts\python.exe scripts/backup.py
 docker build -t sandhata:0.2.0 .
 ```
@@ -49,6 +50,8 @@ In Discover, **Target companies** keeps a personal list of Greenhouse, Lever and
 Comparisons accept up to 48,000 combined characters with the default `SANDHATA_MODEL_CONTEXT=32768`; a smaller context lowers the limit. After upgrading, apply the schema with `scripts/migrate.py --schema-only` (the start script also applies it) and restart the web and worker processes. Greenhouse postings imported earlier may contain HTML tags; scan or import that board again.
 
 ## Documents
+
+**Tailor** suggests changes to one resume for one job. A local model drafts them, code checks that each is backed by your own resume text, and a second AI check can reject or flag it. You approve each change separately; a new version and Word file are created and the original is not changed. The checks can miss things, so read every change. Design: `docs/25_Resume_Tailor_Design.md`. An existing database needs a backup and then `scripts/migrate.py`.
 
 **Resume Library** stores resumes, cover letters and other PDF or DOCX files, up to 50 documents and 100 MB per member. Each can be renamed, marked active or inactive, downloaded or deleted. Only active resumes are offered for comparisons and applications; cover letters and other documents are not compared or searched.
 

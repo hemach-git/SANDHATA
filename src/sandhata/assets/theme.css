@@ -266,3 +266,11 @@ body:has(.sn-workspace-marker) .st-key-sn_insights [data-testid="stDateInput"] d
 /* Every remaining Insights border and field outline follows the slate palette. */
 body:has(.sn-workspace-marker) .st-key-sn_insights{--sn-border:var(--in-border)}
 body:has(.sn-workspace-marker) .st-key-sn_insights [data-testid="stExpander"] *,body:has(.sn-workspace-marker) .st-key-sn_insights [data-testid="stTable"] *{border-color:var(--in-border)!important}
+
+/* Resume Tailor: before and after text, and cited evidence inside the resume. */
+.sn-quote{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--sn-field);color:var(--sn-ink);border:1.5px solid var(--sn-border);border-radius:8px;padding:.6rem .8rem;font-size:.92rem;line-height:1.6}
+.sn-resume{max-height:340px;overflow:auto;font-size:.82rem}
+.sn-quote del{background:var(--sn-warn);color:var(--sn-on-warn);text-decoration:line-through}
+.sn-quote ins{background:var(--sn-select);color:var(--sn-on-select);text-decoration:underline;font-weight:800}
+.sn-quote mark{background:var(--sn-select);color:var(--sn-on-select);border-radius:3px}
+.sn-quote mark.sn-target{outline:2px solid var(--sn-accent);outline-offset:1px}
