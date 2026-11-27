@@ -48,6 +48,12 @@ In Discover, **Target companies** keeps a personal list of Greenhouse, Lever and
 
 Comparisons accept up to 48,000 combined characters with the default `SANDHATA_MODEL_CONTEXT=32768`; a smaller context lowers the limit. After upgrading, apply the schema with `scripts/migrate.py --schema-only` (the start script also applies it) and restart the web and worker processes. Greenhouse postings imported earlier may contain HTML tags; scan or import that board again.
 
+## Documents
+
+**Resume Library** stores resumes, cover letters and other PDF or DOCX files, up to 50 documents and 100 MB per member. Each can be renamed, marked active or inactive, downloaded or deleted. Only active resumes are offered for comparisons and applications; cover letters and other documents are not compared or searched.
+
+Administrators have a **Documents** tab in the Admin Console covering every member. Viewing, downloading, activating, deactivating and deleting require a reason and are written to the audit log.
+
 ## Deployment and GitHub
 
 Current operation is local to this home computer, with individual user logins. Use a separate browser profile per person and sign out when switching users. AWS is a future deployment target; the CHAKRA AWS account/profile is excluded. See [the AWS deployment guide](docs/24_AWS_Deployment_Guide.md) and `deploy/aws/foundation.json` for the isolated infrastructure foundation. Read-only STS and CloudFormation template validation passed; no AWS infrastructure has been created. A future separate AWS setup, domain and budget will be supplied when deployment resumes.

@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 import plotly.io as pio
 from streamlit.testing.v1 import AppTest
-from sandhata.presentation import hero_markup,capabilities_markup,BLUE,TURMERIC,WHITE
+from sandhata.presentation import hero_markup,capabilities_markup,EMERALD,GOLD,WHITE
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -34,15 +34,15 @@ def test_signed_out_page_renders_and_keeps_the_authentication_gate():
     assert '<iframe' not in shell and 'fetch(' not in template
     layout=pio.templates['SANDHATA'].layout
     assert layout.paper_bgcolor==WHITE and layout.plot_bgcolor==WHITE
-    assert list(layout.colorway)[:2]==[BLUE,TURMERIC]
+    assert list(layout.colorway)[:2]==[EMERALD,GOLD]
 
 def test_theme_keeps_requested_palette_and_mobile_layout():
     css=(ROOT/'src/sandhata/assets/theme.css').read_text(encoding='utf-8')
-    assert all(color in css for color in (BLUE,TURMERIC,WHITE))
+    assert all(color in css for color in (EMERALD,GOLD,WHITE))
     assert '@media(max-width:850px)' in css and '@media(max-width:520px)' in css
     assert '.sn-feature span{font-weight:700}' in css
-    assert '.sn-capability{background:var(--sn-sandal)' in css
-    assert '--sn-sandal:#F8E8B4' in css and 'border-top:5px solid var(--sn-sandal)' in css
+    assert '.sn-capability{background:var(--sn-soft)' in css
+    assert '--sn-side:#065F46' in css and 'border-top:5px solid var(--sn-soft)' in css
     assert 'focus-visible' in css and 'prefers-reduced-motion' in css
 
 
@@ -52,11 +52,11 @@ def test_dark_appearance_updates_charts_and_keeps_chart_rows_readable():
     app=AppTest.from_file(ROOT/'app.py').run(timeout=15)
     app.toggle[0].set_value(True).run()
     assert not app.exception
-    assert pio.templates['SANDHATA'].layout.paper_bgcolor=='#152238'
-    assert pio.templates['SANDHATA'].layout.font.color=='#EEF3FC'
+    assert pio.templates['SANDHATA'].layout.paper_bgcolor=='#06150F'
+    assert pio.templates['SANDHATA'].layout.font.color=='#ECFDF5'
     figure=compact_chart(px.bar(x=[1,2],y=['Short','Long requirement label'],orientation='h'),rows=2)
-    assert figure.layout.paper_bgcolor=='#152238'
-    assert figure.layout.plot_bgcolor=='#152238'
+    assert figure.layout.paper_bgcolor=='#06150F'
+    assert figure.layout.plot_bgcolor=='#06150F'
     assert figure.layout.height==170
     assert chart_height(10)==350 and chart_height(1)==170
     assert figure.layout.yaxis.automargin

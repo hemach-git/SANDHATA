@@ -90,3 +90,43 @@ BEGIN
 END $$;
 REVOKE ALL ON FUNCTION appsec.delete_tracker(uuid,text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION appsec.delete_tracker(uuid,text) TO sandhata_app;
+
+-- Administrator access to member documents. Row policies stay owner-only; these audited functions are the only path.
+CREATE OR REPLACE FUNCTION appsec.admin_list_documents()
+RETURNS TABLE(id uuid,owner_user_id uuid,owner_name text,owner_email text,label text,doc_type text,active boolean,created_at timestamptz)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,pg_temp AS $$
+BEGIN
+ IF NOT appsec.is_admin() THEN RAISE EXCEPTION 'admin_required'; END IF;
+ RETURN QUERY SELECT r.id,r.owner_user_id,a.display_name,a.email,r.label,r.doc_type,r.active,r.created_at
+ FROM resumes r JOIN accounts a ON a.id=r.owner_user_id
+ WHERE r.tenant_id=current_setting('app.tenant_id')::uuid ORDER BY a.display_name,r.created_at DESC;
+END $$;
+
+CREATE OR REPLACE FUNCTION appsec.admin_document(target uuid,operation text,why text)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,pg_temp AS $$
+DECLARE t uuid; doc resumes; result jsonb;
+BEGIN
+ IF NOT appsec.is_admin() THEN RAISE EXCEPTION 'admin_required'; END IF;
+ IF operation NOT IN ('view','download','activate','deactivate','delete') THEN RAISE EXCEPTION 'operation_not_allowed'; END IF;
+ IF length(trim(why))<5 THEN RAISE EXCEPTION 'reason_required'; END IF;
+ t:=current_setting('app.tenant_id')::uuid;
+ SELECT * INTO doc FROM resumes r WHERE r.id=target AND r.tenant_id=t FOR UPDATE;
+ IF NOT FOUND THEN RAISE EXCEPTION 'document_unavailable'; END IF;
+ result:=jsonb_build_object('id',doc.id,'label',doc.label,'doc_type',doc.doc_type,'object_key',doc.object_key);
+ IF operation='view' THEN
+   result:=result||jsonb_build_object('body',doc.body);
+ ELSIF operation IN ('activate','deactivate') THEN
+   UPDATE resumes SET active=(operation='activate') WHERE id=doc.id;
+ ELSIF operation='delete' THEN
+   INSERT INTO deletion_tombstones(tenant_id,owner_user_id,object_id,object_type) VALUES(t,doc.owner_user_id,doc.id,'resume') ON CONFLICT DO NOTHING;
+   UPDATE applications SET resume_id=NULL WHERE tenant_id=t AND resume_id=doc.id;
+   DELETE FROM assessments WHERE tenant_id=t AND resume_id=doc.id;
+   DELETE FROM tasks WHERE tenant_id=t AND owner_user_id=doc.owner_user_id AND payload->>'resume_id'=doc.id::text;
+   DELETE FROM passages WHERE tenant_id=t AND parent_type='resume' AND parent_id=doc.id;
+   DELETE FROM resumes WHERE id=doc.id;
+ END IF;
+ INSERT INTO admin_audit(tenant_id,actor_id,action,target,reason,metadata) VALUES(t,current_setting('app.user_id')::uuid,'document_'||operation,doc.id::text,left(why,300),jsonb_build_object('owner',doc.owner_user_id,'doc_type',doc.doc_type));
+ RETURN result;
+END $$;
+REVOKE ALL ON FUNCTION appsec.admin_list_documents(),appsec.admin_document(uuid,text,text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION appsec.admin_list_documents(),appsec.admin_document(uuid,text,text) TO sandhata_app;

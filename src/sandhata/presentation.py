@@ -8,24 +8,26 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 BRAND='SANDHĀTĀ'
-BLUE='#164B99'
-INK='#123263'
-TURMERIC='#F4C430'
+EMERALD='#047857'
+INK='#064E3B'
+GOLD='#F4C430'
+BORDER='#059669'
+EXPANSION=('Search','Analyze','Navigate','Discover','Highlight','Apply','Track','Advance')
 WHITE='#FFFFFF'
 ASSETS=Path(__file__).parent/'assets'
 FEATURES=(
-    ('search','Discover opportunities','Search supported feeds for roles that fit your goals.'),
+    ('search','Watch target companies','Scan your chosen employer boards and spot new roles.'),
     ('source','Bring your sources together','Save complete postings from your premium searches.'),
     ('document','Choose your resume','Keep versions organized and inspect the extracted text.'),
     ('target','Compare with evidence','See alignment, gaps and the quotations behind each result.'),
-    ('chart','Track every next step','Record applications, interviews and follow-ups.'),
+    ('chart','Act on today','See follow-ups due, quiet applications and new matches.'),
     ('trend','Understand your progress','Explore trends, source outcomes and recurring skill gaps.'),
 )
 CAPABILITIES=(
-    ('search','Job discovery','Your search, across supported sources.','Filter by role, skills, location and salary.'),
+    ('search','Job discovery','Your companies and searches, in one list.','Build a company watchlist and filter new roles.'),
     ('document','Resume library','The right resume for each opportunity.','Upload, label and select a version.'),
     ('target','Evidence-based fit','Understand the match behind the number.','Review supported skills and evidence gaps.'),
-    ('check','Application tracker','Keep your next action in sight.','Update status, notes and follow-up dates.'),
+    ('check','Daily actions and tracker','Keep your next action in sight.','Review what is due today and update each application.'),
     ('chart','Career insights','Turn activity into useful perspective.','Explore your pipeline and application trends.'),
     ('source','Evidence search','Return to the details that matter.','Find saved passages with source references.'),
 )
@@ -43,10 +45,10 @@ def icon(name):
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+PATHS[name]+'</svg>'
 
 def mark():
-    return '<svg class="sn-mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="#FFFFFF" stroke="#F4C430" stroke-width="2"/><path d="m31 13-4 16-13 6 6-14Z" fill="#164B99"/><path d="m31 13-4 16-7-8Z" fill="#F4C430"/><circle cx="24" cy="25" r="2" fill="#FFFFFF"/></svg>'
+    return '<svg class="sn-mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="#FFFFFF" stroke="#F4C430" stroke-width="2"/><path d="m31 13-4 16-13 6 6-14Z" fill="#047857"/><path d="m31 13-4 16-7-8Z" fill="#F4C430"/><circle cx="24" cy="25" r="2" fill="#FFFFFF"/></svg>'
 
 def hero_markup():
-    words=['Search','Analyze','Navigate','Discover','Highlight','Apply','Track','Advance']
+    words=EXPANSION
     expansion=''.join('<div>'+'<i aria-hidden="true"> · </i>'.join('<span><b>'+w[0]+'</b>'+w[1:]+'</span>' for w in words[i:i+4])+'</div>' for i in (0,4))
     features=''.join('<div class="sn-feature">'+icon(kind)+'<strong>'+title+'</strong><span>'+description+'</span></div>' for kind,title,description in FEATURES)
     return '<section class="sn-intro" aria-label="SANDHĀTĀ introduction"><div class="sn-brand">'+mark()+'<h1>SANDHĀTĀ</h1><span class="sn-descriptor">Career Intelligence</span></div><p class="sn-tagline">Find your direction. Advance with confidence.</p><div class="sn-expansion" aria-label="The meaning of SANDHĀTĀ">'+expansion+'</div><p class="sn-summary">Discover opportunities, compare your strengths, and bring every next step into focus.</p></section><section class="sn-features" aria-label="Career intelligence features"><h2>Built for your next chapter</h2>'+features+'</section>'
@@ -81,18 +83,19 @@ def configure_visuals():
     mode='dark' if dark else 'light'
     components.html('<script>document.cookie="SANDHATA_THEME='+mode+'; Path=/; Max-Age=31536000; SameSite=Lax";</script>',height=0)
     st.html('<span class="sn-theme-'+mode+'"></span><style>'+(ASSETS/'theme.css').read_text(encoding='utf-8')+'</style>')
-    surface='#152238' if dark else WHITE
-    text='#EEF3FC' if dark else INK
-    blue='#9BC2FF' if dark else BLUE
-    grid='#34465E' if dark else '#E8EEF7'
+    surface='#06150F' if dark else WHITE
+    text='#ECFDF5' if dark else '#0B2A1F'
+    title='#FFE07A' if dark else INK
+    accent='#6EE7B7' if dark else EMERALD
+    grid='#1E4A36' if dark else '#D7EFE3'
     pio.templates['SANDHATA']=go.layout.Template(layout=dict(
-        colorway=['#77A9F3' if dark else BLUE,TURMERIC,'#437BC1','#9DBBE0','#8B6914','#DCE8F7'],
+        colorway=['#34D399' if dark else EMERALD,GOLD,'#6EE7B7' if dark else '#34D399','#A7F3D0' if dark else '#065F46','#FDBA74' if dark else '#B45309','#FFE07A' if dark else '#A7F3D0'],
         paper_bgcolor=surface,plot_bgcolor=surface,font=dict(family='Arial, sans-serif',color=text),
-        title=dict(font=dict(color=text,size=15)),
+        title=dict(font=dict(color=title,size=15)),
         xaxis=dict(gridcolor=grid,zerolinecolor=grid),
         yaxis=dict(gridcolor=grid,zerolinecolor=grid),
-        hoverlabel=dict(bgcolor=surface,bordercolor='#D8B65A',font_color=text),
-        modebar=dict(bgcolor=surface,color=blue,activecolor=TURMERIC)))
+        hoverlabel=dict(bgcolor=surface,bordercolor='#34D399' if dark else BORDER,font_color=text),
+        modebar=dict(bgcolor=surface,color=accent,activecolor=GOLD)))
     pio.templates.default='SANDHATA'
 
 def landing(auth_ready):
@@ -118,4 +121,4 @@ def display_name(value):
     return 'Administrator' if value in ('Family Administrator','Family Administrator Family','Administrator Family') else str(value)
 
 def workspace_brand():
-    return '<div class="sn-workspace-brand">'+mark()+'<div><strong>SANDHĀTĀ</strong><span>CAREER INTELLIGENCE</span></div></div>'
+    return '<div class="sn-workspace-brand">'+mark()+'<div><strong>SANDHĀTĀ</strong><span>CAREER INTELLIGENCE</span></div></div><div class="sn-workspace-tagline">'+' · '.join('<span><b>'+w[0]+'</b>'+w[1:]+'</span>' for w in EXPANSION)+'</div>'

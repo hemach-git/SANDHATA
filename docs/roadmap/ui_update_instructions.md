@@ -45,7 +45,7 @@ powershell -ExecutionPolicy Bypass -File scripts/start_local.ps1   # http://loca
 
 **Visual design**
 - Streamlit 1.66.1, Plotly 6.9.0, pandas 2.3.3. Do not add a front-end framework.
-- Blue `#164B99`, ink `#123263`, turmeric `#F4C430`, sandal `#F8E8B4`, border `#D8B65A`. Use the CSS variables in `theme.css`.
+- Emerald and Gold, chosen November 26 2026: emerald `#047857`, title `#064E3B`, border `#059669`, sidebar `#065F46`, gold `#F4C430`. Dark mode: page `#06150F`, border `#34D399`, buttons gold. Use the CSS variables in `theme.css`.
 - Support light and dark appearance, widths down to 520 px, keyboard focus and reduced motion.
 - Scope workspace styles to `body:has(.sn-workspace-marker)` so the landing page is unaffected.
 - Use `compact_dataframe` and `compact_chart`.

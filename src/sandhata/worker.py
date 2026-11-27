@@ -9,7 +9,7 @@ def enqueue(p,job_version_id,resume_id,request_id=None):
     with transaction(p) as c:
         c.exec_driver_sql('SELECT pg_advisory_xact_lock(hashtextextended(%(k)s,0))',dict(k=p.user_id+'quota'))
         job=one(c,'SELECT id FROM job_versions WHERE id=%(id)s::uuid',dict(id=str(job_version_id)))
-        resume=one(c,'SELECT id FROM resumes WHERE id=%(id)s::uuid',dict(id=str(resume_id)))
+        resume=one(c,"SELECT id FROM resumes WHERE id=%(id)s::uuid AND doc_type='resume' AND active",dict(id=str(resume_id)))
         if not job or not resume: raise AppError('Selected documents are not available in your workspace.')
         quota=one(c,'SELECT quota FROM memberships WHERE user_id=%(u)s::uuid',dict(u=p.user_id))['quota']
         count=one(c,"SELECT count(*) n FROM tasks WHERE created_at>=date_trunc('day',now())")['n']

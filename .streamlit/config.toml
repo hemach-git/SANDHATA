@@ -9,8 +9,13 @@ maxUploadSize = 10
 gatherUsageStats = false
 
 [theme]
-primaryColor = "#164B99"
+primaryColor = "#047857"
 backgroundColor = "#FFFFFF"
 secondaryBackgroundColor = "#FFFFFF"
-textColor = "#123263"
+textColor = "#0B2A1F"
+linkColor = "#036249"
+borderColor = "#059669"
+dataframeBorderColor = "#059669"
+dataframeHeaderBackgroundColor = "#065F46"
+dataframeHeaderTextColor = "#FFE28A"
 font = "sans serif"
