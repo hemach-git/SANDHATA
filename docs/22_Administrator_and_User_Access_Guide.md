@@ -15,7 +15,8 @@ One user household contains invited members with individual protected workspaces
 | Capability | Member | Administrator |
 | --- | --- | --- |
 | Own resumes, jobs, matches and tracker | Manage own records | Manage own records |
-| Another member's career content | Denied | Denied in routine application flows |
+| Another member's resumes and cover letters | Denied | View, download, activate, deactivate or delete with a recorded reason (decision of November 26 2026) |
+| Another member's other career content | Denied | Denied in routine application flows |
 | Member list and account state | Own account only | View safe household account metadata |
 | Invitations and activation | Redeem intended invitation | Create, expire and revoke invitations |
 | Roles and suspension | Denied | Manage subject to last-admin protection |

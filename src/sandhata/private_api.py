@@ -7,7 +7,7 @@ from starlette.responses import Response,JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from .config import AppError
 from .identity import capability_principal,audit_events
-from .repository import resume_download,list_jobs,list_applications,tracker_metrics
+from .repository import resume_download,admin_download,list_jobs,list_applications,tracker_metrics
 
 def csv_bytes(records):
     import pandas as pd
@@ -25,7 +25,10 @@ async def download(request):
         p=capability_principal(header[7:])
         kind=request.path_params['kind'];identifier=request.path_params.get('identifier','')
         if kind=='resume':
-            data,ext=resume_download(p,identifier); filename='SANDHATA_RESUME'+ext;media='application/octet-stream'
+            data,ext=resume_download(p,identifier); filename='SANDHATA_DOCUMENT'+ext;media='application/octet-stream'
+        elif kind=='admin-document':
+            # The service verifies the administrator role and records the reason before releasing bytes.
+            data,ext=admin_download(p,identifier,request.query_params['reason']); filename='SANDHATA_DOCUMENT'+ext;media='application/octet-stream'
         elif kind=='jobs':
             data=csv_bytes([{k:v for k,v in j.items() if k not in ('body','raw_html')} for j in list_jobs(p)])
             filename='SANDHATA_JOBS.csv';media='text/csv'

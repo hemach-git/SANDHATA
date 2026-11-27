@@ -55,6 +55,8 @@ CREATE TABLE IF NOT EXISTS resumes (
  object_key text NOT NULL, file_hash text NOT NULL, body text NOT NULL, parser_version text NOT NULL,
  created_at timestamptz NOT NULL DEFAULT now(), UNIQUE(tenant_id,owner_user_id,id)
 );
+ALTER TABLE resumes ADD COLUMN IF NOT EXISTS doc_type text NOT NULL DEFAULT 'resume' CHECK(doc_type IN ('resume','cover_letter','other'));
+ALTER TABLE resumes ADD COLUMN IF NOT EXISTS active boolean NOT NULL DEFAULT true;
 CREATE TABLE IF NOT EXISTS passages (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL, owner_user_id uuid NOT NULL,
  parent_id uuid NOT NULL, parent_type text NOT NULL CHECK(parent_type IN ('resume','job')),

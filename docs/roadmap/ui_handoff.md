@@ -45,3 +45,7 @@ The owner wants all updates committed together from the main session. Nothing is
 - Not verified: real signed-in session (including the single "Administrator" label), live employer scans, an Ollama comparison, Resume Library and Admin Console appearance, hover states, keyboard focus, reduced motion.
 - The last Insights border and date fixes were captured but not inspected by eye.
 - Dataframe rows stay white in dark mode.
+
+## Merged
+
+November 26 2026: committed and merged with the document manager on feature/ui-and-documents. The UI files are no longer reserved for a separate session.
